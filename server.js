@@ -275,7 +275,7 @@ app.post('/api/admin/send-followup/:id', authenticateAdmin, (req, res) => {
     from: process.env.EMAIL_USER,
     to: row.email,
     subject: 'Your Next Step — Eternal Wealth Partners',
-    html: `<h2>Hi ${row.name},</h2><p>${message}</p><p>— Becky Gustafson<br>Eternal Wealth Partners</p>`
+    html: `<h2>Hi ${row.name},</h2><p>${message}</p><p>— <a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/">Becky Gustafson</a><br>Eternal Wealth Partners</p>`
   }).then(() => {
     db.prepare('UPDATE submissions SET follow_up_sent = 1 WHERE id = ?').run(req.params.id);
     res.json({ success: true });
@@ -387,8 +387,8 @@ async function sendConfirmation(email, name, delegationTask) {
           </div>
         </div>
         <div style="padding:1rem;text-align:center;font-size:0.85rem;color:#999;">
-          <p>Becky Gustafson | Eternal Wealth Partners</p>
-          <p>Natalie Barranco | Prime BAS</p>
+          <p><a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="color:#0099a1;">Becky Gustafson</a> | Eternal Wealth Partners</p>
+          <p><a href="https://primebas.com/" style="color:#0099a1;">Natalie Barranco</a> | Prime BAS</p>
         </div>
       </div>
     `

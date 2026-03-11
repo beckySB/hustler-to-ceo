@@ -16,6 +16,10 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Fallback credentials (Railway env vars may not be set)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'becky@siliconbayou.ai';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '1234';
+
 // ─── Middleware ───────────────────────────────────────────
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
@@ -91,7 +95,7 @@ function authenticateAdmin(req, res, next) {
   if (!token) return res.status(401).json({ error: 'No token provided' });
   
   const expected = Buffer.from(
-    `${process.env.ADMIN_EMAIL}:${process.env.ADMIN_PASSWORD}`
+    `${ADMIN_EMAIL}:${ADMIN_PASSWORD}`
   ).toString('base64');
   
   if (token === expected) return next();
@@ -215,7 +219,7 @@ app.get('/api/my-report/:email', (req, res) => {
 // POST /api/admin/login
 app.post('/api/admin/login', (req, res) => {
   const { email, password } = req.body;
-  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
     const token = Buffer.from(`${email}:${password}`).toString('base64');
     db.prepare('INSERT INTO audit_log (action, detail, ip_address) VALUES (?, ?, ?)').run(
       'ADMIN_LOGIN', email, req.ip
@@ -361,7 +365,7 @@ function generateInsights(row, pillarScores) {
 // ─── Admin Notification ──────────────────────────────────
 async function sendAdminNotification(b) {
   if (!transporter) return;
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminEmail = ADMIN_EMAIL;
   if (!adminEmail) return;
   
   const gapLabel = (b.ceoGapScore || 0) >= 16 ? '🟢 CEO Mode' : (b.ceoGapScore || 0) >= 10 ? '🟡 In Transition' : '🔴 Hustle Mode';

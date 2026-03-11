@@ -426,6 +426,9 @@ async function sendConfirmation(email, name, delegationTask) {
             <p style="margin:0;font-weight:600;color:#1a4d5c;">Your 30-Day Commitment:</p>
             <p style="margin:0.5rem 0 0;">${delegationTask}</p>
           </div>` : ''}
+          <div style="text-align:center;margin:1.5rem 0;">
+            <a href="https://hustler-to-ceo-production.up.railway.app/#report/${encodeURIComponent(email)}" style="display:inline-block;padding:0.75rem 2rem;background:#1a4d5c;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">📊 View Your Personalized CEO Report →</a>
+          </div>
           <h3 style="color:#0099a1;">Your Next 30 Days:</h3>
           <ol style="line-height:2;">
             <li><strong>This week:</strong> Document the task and map the transition plan</li>
@@ -451,6 +454,73 @@ async function sendConfirmation(email, name, delegationTask) {
   });
   console.log('✓ Confirmation email sent to', email);
 }
+
+// ─── 7-Day Follow-Up Email ────────────────────────────────
+async function sendFollowUp(row) {
+  if (!transporter) return;
+  const reportUrl = `https://hustler-to-ceo-production.up.railway.app/#report/${encodeURIComponent(row.email)}`;
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: row.email,
+    subject: `${row.name}, how's your 30-day commitment going?`,
+    html: `
+      <div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;color:#333;">
+        <div style="background:linear-gradient(135deg,#1a4d5c,#0099a1);padding:2rem;text-align:center;border-radius:8px 8px 0 0;">
+          <h1 style="color:#fff;font-weight:300;margin:0;">Week 1 Check-In</h1>
+          <p style="color:rgba(255,255,255,0.8);margin-top:0.5rem;">From Hustler to CEO</p>
+        </div>
+        <div style="padding:2rem;background:#fff;border:1px solid #e5e5e5;">
+          <h2 style="color:#1a4d5c;">Hi ${row.name},</h2>
+          <p>It's been one week since the workshop. By now, you should be in <strong>Phase 1: Document & Plan</strong> for your 30-day commitment.</p>
+          ${row.delegation_task ? `<div style="background:#f0f8f9;padding:1.5rem;border-left:4px solid #0099a1;border-radius:4px;margin:1.5rem 0;">
+            <p style="margin:0;font-weight:600;color:#1a4d5c;">Your Commitment:</p>
+            <p style="margin:0.5rem 0 0;">${row.delegation_task}</p>
+          </div>` : ''}
+          <h3 style="color:#0099a1;">Quick Self-Check:</h3>
+          <ul style="line-height:2;">
+            <li>Have you documented the task you're delegating?</li>
+            <li>Have you identified <em>who</em> will take it over?</li>
+            <li>Have you modeled the cost vs. the hours freed?</li>
+          </ul>
+          <p>If you answered "no" to any of these — <strong>that's normal.</strong> The difference between a hustler and a CEO is that the CEO takes the next step anyway.</p>
+          <div style="text-align:center;margin:1.5rem 0;">
+            <a href="${reportUrl}" style="display:inline-block;padding:0.75rem 2rem;background:#1a4d5c;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">📊 Review Your CEO Report →</a>
+          </div>
+          <div style="background:linear-gradient(135deg,#fffbf0,#fff5e6);padding:1.5rem;border-left:4px solid #d4a574;border-radius:4px;margin:1.5rem 0;">
+            <p style="margin:0;font-weight:600;color:#1a4d5c;">Need help getting unstuck?</p>
+            <p style="margin:0.5rem 0 0;">A 20-minute <strong>Business Wealth Consultation</strong> with Eternal Wealth Partners can help you model the financial impact of your delegation and build the architecture to make it sustainable.</p>
+          </div>
+          <div style="text-align:center;margin-top:1.5rem;">
+            <a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="display:inline-block;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">Schedule Your Consultation →</a>
+          </div>
+        </div>
+        <div style="padding:1rem;text-align:center;font-size:0.85rem;color:#999;">
+          <p><a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="color:#0099a1;">Becky Gustafson</a> | Eternal Wealth Partners</p>
+          <p><a href="https://primebas.com/" style="color:#0099a1;">Natalie Barranco</a> | Prime BAS</p>
+        </div>
+      </div>
+    `
+  });
+  db.prepare('UPDATE submissions SET follow_up_sent = 1 WHERE id = ?').run(row.id);
+  console.log('✓ 7-day follow-up sent to', row.email);
+}
+
+// ─── Follow-Up Scheduler (checks every hour) ─────────────
+setInterval(() => {
+  try {
+    const due = db.prepare(`
+      SELECT * FROM submissions 
+      WHERE follow_up_sent = 0 
+      AND submitted_at <= datetime('now', '-7 days')
+    `).all();
+    if (due.length > 0) {
+      console.log(`📬 ${due.length} follow-up(s) due...`);
+      due.forEach(row => sendFollowUp(row).catch(e => console.error('Follow-up error:', e.message)));
+    }
+  } catch (e) {
+    console.error('Follow-up scheduler error:', e.message);
+  }
+}, 60 * 60 * 1000); // every hour
 
 // ─── Serve SPA routes ────────────────────────────────────
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

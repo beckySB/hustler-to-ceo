@@ -91,6 +91,14 @@
     .modal h2{margin-bottom:1rem}
     .hidden{display:none!important}
     @media(max-width:768px){.container{padding:1rem}.page{padding:1.25rem}.grid-2{grid-template-columns:1fr}.header h1{font-size:1.3rem}.nav-btn{padding:0.5rem 0.75rem;font-size:0.75rem}}
+    @media print{
+      .header,.footer,.nav-tabs,.no-print{display:none!important}
+      body{background:#fff;font-size:11pt}
+      .container{max-width:100%;padding:0}
+      .page{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid;margin-bottom:1rem}
+      .btn{display:none!important}
+      @page{margin:0.75in;size:letter}
+    }
   </style>
 </head>
 <body>
@@ -339,6 +347,9 @@
       }
 
       // CTA
+      // Download PDF button
+      html += '<div class="page" style="text-align:center;"><h2 style="margin-top:0;">Save Your Report</h2><p>Download a PDF copy of your personalized CEO Action Report to reference anytime.</p><button class="btn btn-primary" onclick="window.printReport()" style="font-size:1.1rem;padding:0.75rem 2.5rem;">📄 Download PDF Report</button></div>';
+
       html += '<div class="page" style="text-align:center;border-left-color:var(--gold);"><h2 style="margin-top:0;">Ready for Your Next Step?</h2><p>The women who transform their businesses don\'t do it alone.</p><div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;"><a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" target="_blank" class="btn btn-primary" style="text-decoration:none;">Connect with Becky Gustafson →</a><a href="https://primebas.com/" target="_blank" class="btn btn-gold" style="text-decoration:none;">Connect with Natalie Barranco →</a></div><p style="font-size:0.85rem;color:#888;"><a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" target="_blank" style="color:var(--teal);">Becky Gustafson</a> — Financial Clarity &nbsp;|&nbsp; <a href="https://primebas.com/" target="_blank" style="color:var(--teal);">Natalie Barranco</a> — Operational Design</p></div>';
 
       app.innerHTML = html;
@@ -459,6 +470,13 @@
       if (e.key === 'Enter') document.getElementById('aLoginBtn').click();
     });
   }
+
+  window.printReport = function() {
+    var title = document.title;
+    document.title = 'CEO Action Report — From Hustler to CEO';
+    window.print();
+    document.title = title;
+  };
 
   function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
 

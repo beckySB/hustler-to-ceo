@@ -392,7 +392,19 @@
         var a = analytics;
         var subs = subData.submissions || [];
 
-        var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem;"><h2 style="margin:0;">Admin Dashboard</h2><div style="display:flex;gap:0.5rem;"><a href="' + API + '/api/admin/export-csv" class="btn btn-sm btn-gold" style="text-decoration:none;" target="_blank">📊 Export CSV</a><button class="btn btn-sm btn-danger" onclick="sessionStorage.removeItem(\'admin_token\');location.hash=\'admin\';">Logout</button></div></div>';
+        // CSV export needs auth - use JS fetch + blob download
+        window.exportCSV = function() {
+          fetch(API + '/api/admin/export-csv', { headers: {'Authorization': 'Bearer ' + token} })
+          .then(function(r) { return r.blob(); })
+          .then(function(blob) {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a'); a.href = url; a.download = 'workshop-submissions.csv';
+            document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+            toast('CSV downloaded!', 'success');
+          }).catch(function(e) { toast('Export failed: ' + e.message, 'error'); });
+        };
+
+        var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem;"><h2 style="margin:0;">Admin Dashboard</h2><div style="display:flex;gap:0.5rem;"><button class="btn btn-sm btn-gold" onclick="exportCSV()">📊 Export CSV</button><button class="btn btn-sm btn-danger" onclick="sessionStorage.removeItem(\'admin_token\');location.hash=\'admin\';">Logout</button></div></div>';
 
         // Stats
         html += '<div class="grid-3" style="margin-bottom:1.5rem;">';
@@ -422,6 +434,27 @@
           }
           html += '</div>';
         }
+
+        // ─── Score Interpretation Guide ───
+        html += '<div class="admin-card" style="margin-bottom:1.5rem;"><h3 style="margin-top:0;">📋 CEO Gap Score — Action Guide</h3><p style="font-size:0.85rem;color:#888;margin-bottom:1rem;">Use this to interpret scores and determine next steps for each participant.</p>';
+        html += '<div style="display:grid;gap:0.75rem;">';
+        html += '<div style="padding:1rem;border-radius:8px;background:#fdf2f2;border-left:4px solid #e74c3c;"><div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#e74c3c;">4–9: Hustle Mode 🔴</strong><button class="btn btn-sm btn-outline" onclick="copyToClip(this,\'hustle\')" style="font-size:0.7rem;">Copy Follow-Up</button></div><p style="font-size:0.85rem;margin:0.5rem 0 0;"><strong>What it means:</strong> Owner IS the business. Revenue stops when they stop. No financial visibility, no delegation, no systems.</p><p style="font-size:0.85rem;margin:0.25rem 0 0;"><strong>Action steps:</strong> ① Identify ONE task to delegate this month ② Calculate their true hourly rate (usually shocking) ③ Document their top 5 weekly tasks and categorize (CEO Work vs Delegate vs Eliminate) ④ Schedule EWP consultation for financial architecture</p><p style="font-size:0.85rem;margin:0.25rem 0 0;"><strong>EWP opportunity:</strong> Financial Architecture + Cash Flow Planning — they likely have no margin discipline or reinvestment strategy.</p></div>';
+        html += '<div style="padding:1rem;border-radius:8px;background:#fefce8;border-left:4px solid #f59e0b;"><div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#b45309;">10–15: In Transition 🟡</strong><button class="btn btn-sm btn-outline" onclick="copyToClip(this,\'transition\')" style="font-size:0.7rem;">Copy Follow-Up</button></div><p style="font-size:0.85rem;margin:0.5rem 0 0;"><strong>What it means:</strong> Started delegating but still holds too many roles. Knows they need to change but hasn\'t built the systems yet.</p><p style="font-size:0.85rem;margin:0.25rem 0 0;"><strong>Action steps:</strong> ① Map their CEO Calendar — target 60%+ on strategic work ② Build a delegation cost model (what does it cost vs. what does it free up?) ③ Set 3 monthly KPIs: cash flow, profit margin, effective hourly rate ④ Schedule EWP consultation for Pillar 2 (Financial Architecture)</p><p style="font-size:0.85rem;margin:0.25rem 0 0;"><strong>EWP opportunity:</strong> Business Wealth Planning — they\'re ready to think about the business as an asset, not just income.</p></div>';
+        html += '<div style="padding:1rem;border-radius:8px;background:#f0fdf4;border-left:4px solid #27ae60;"><div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#27ae60;">16–20: CEO Mode 🟢</strong><button class="btn btn-sm btn-outline" onclick="copyToClip(this,\'ceo\')" style="font-size:0.7rem;">Copy Follow-Up</button></div><p style="font-size:0.85rem;margin:0.5rem 0 0;"><strong>What it means:</strong> Operating like a CEO. Business runs without them for daily ops. Has financial visibility and a strategic roadmap.</p><p style="font-size:0.85rem;margin:0.25rem 0 0;"><strong>Action steps:</strong> ① Optimize — fine-tune margins, reduce key-person dependency ② Model the business valuation (what\'s it worth today vs. 3 years from now?) ③ Build succession/exit readiness plan ④ Schedule EWP consultation for Wealth Architecture + Valuation Planning</p><p style="font-size:0.85rem;margin:0.25rem 0 0;"><strong>EWP opportunity:</strong> Full Business Valuation + Wealth Transfer Planning — they\'re building an asset worth multiples.</p></div>';
+        html += '</div></div>';
+
+        // ─── Follow-Up Message Templates ───
+        html += '<div class="admin-card" style="margin-bottom:1.5rem;"><h3 style="margin-top:0;">✉️ Follow-Up Templates — Copy & Paste</h3><p style="font-size:0.85rem;color:#888;margin-bottom:1rem;">Click a template to copy, then paste into your email client. Replace [NAME], [COMPANY], [TASK] with their details.</p>';
+        html += '<div style="display:grid;gap:0.75rem;">';
+        // Template 1: Discovery Call
+        html += '<div style="padding:1rem;border-radius:8px;background:rgba(0,153,161,0.04);border:1px solid rgba(0,153,161,0.15);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;"><strong style="color:var(--teal);">Discovery Call Follow-Up</strong><button class="btn btn-sm btn-primary" onclick="copyTemplate(1)" style="font-size:0.7rem;">📋 Copy</button></div><div id="tmpl1" style="font-size:0.8rem;white-space:pre-wrap;color:#555;font-family:inherit;line-height:1.6;">Hi [NAME],\n\nIt was great connecting at the Women\'s Leadership Conference. Your work at [COMPANY] is impressive, and I could see from your workbook that you\'re ready to make the shift from hustler to CEO.\n\nYour CEO Gap Score tells me you\'re [in transition / in hustle mode / already operating like a CEO] — and your commitment to [TASK] in the next 30 days is exactly the kind of move that changes the trajectory of a business.\n\nI\'d love to schedule a 20-minute discovery call to talk through:\n• The financial impact of your delegation plan\n• Where your business sits on the wealth-building spectrum\n• One or two quick wins you can implement this month\n\nWould [DAY] at [TIME] work for a quick call?\n\nRooting for you,\nBecky Gustafson\nEternal Wealth Partners\nhttps://www.northwesternmutual.com/financial/advisor/becky-gustafson/</div></div>';
+        // Template 2: Operations Follow-Up (Natalie)
+        html += '<div style="padding:1rem;border-radius:8px;background:rgba(212,165,116,0.06);border:1px solid rgba(212,165,116,0.2);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;"><strong style="color:var(--gold);">Operations Follow-Up (Natalie)</strong><button class="btn btn-sm btn-gold" onclick="copyTemplate(2)" style="font-size:0.7rem;">📋 Copy</button></div><div id="tmpl2" style="font-size:0.8rem;white-space:pre-wrap;color:#555;font-family:inherit;line-height:1.6;">Hi [NAME],\n\nThis is Natalie from Prime BAS — I co-facilitated the "From Hustler to CEO" workshop with Becky Gustafson.\n\nI noticed from your workbook that [TASK] is your 30-day commitment. That\'s one of the most common (and highest-impact) delegations we help business owners implement.\n\nAt Prime BAS, we specialize in exactly this — taking the operational and administrative burden off business owners so you can focus on revenue-generating CEO work.\n\nHere\'s what that could look like for [COMPANY]:\n• We handle: bookkeeping, billing, AR/AP, payroll processing\n• You get back: 10-15 hours/week of CEO time\n• The math: if your effective hourly rate should be $[X]/hr, that\'s $[Y]/month in recaptured value\n\nWant to explore what this looks like for your business? I\'d love a 15-minute chat.\n\nNatalie Barranco\nPrime BAS\nhttps://primebas.com/</div></div>';
+        // Template 3: Group Coaching
+        html += '<div style="padding:1rem;border-radius:8px;background:rgba(0,153,161,0.04);border:1px solid rgba(0,153,161,0.15);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;"><strong style="color:var(--teal);">Group Coaching Interest</strong><button class="btn btn-sm btn-primary" onclick="copyTemplate(3)" style="font-size:0.7rem;">📋 Copy</button></div><div id="tmpl3" style="font-size:0.8rem;white-space:pre-wrap;color:#555;font-family:inherit;line-height:1.6;">Hi [NAME],\n\nThank you for your interest in our group coaching program! The women who go through this together consistently see 2-3x the results of going it alone.\n\nHere\'s what the program includes:\n• Monthly group calls with Becky (financial strategy) and Natalie (operational design)\n• Accountability partners from the cohort\n• Your personalized CEO Dashboard reviewed each month\n• Private community for questions between sessions\n• 1:1 onboarding call to set your 90-day plan\n\nWe\'re forming the next cohort now. Would you like to be on the interest list?\n\nBecky Gustafson\nEternal Wealth Partners</div></div>';
+        // Template 4: Check-in (30 days)
+        html += '<div style="padding:1rem;border-radius:8px;background:rgba(39,174,96,0.04);border:1px solid rgba(39,174,96,0.15);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;"><strong style="color:#27ae60;">30-Day Check-In</strong><button class="btn btn-sm btn-outline" onclick="copyTemplate(4)" style="font-size:0.7rem;">📋 Copy</button></div><div id="tmpl4" style="font-size:0.8rem;white-space:pre-wrap;color:#555;font-family:inherit;line-height:1.6;">Hi [NAME],\n\nIt\'s been 30 days since the workshop — I wanted to check in on your commitment to [TASK].\n\nThree quick questions:\n1. Did you implement the delegation/systemization? (Even partially counts!)\n2. How many hours per week did it free up?\n3. What did you DO with that freed-up time?\n\nThe third question is the CEO question. The hustler delegates and fills the time with more hustle. The CEO redirects that time toward strategy, relationships, and growth.\n\nIf you hit a wall or want help modeling the financial impact, I\'m here. Reply to this email or grab 20 minutes on my calendar.\n\nBecky Gustafson\nEternal Wealth Partners\nhttps://www.northwesternmutual.com/financial/advisor/becky-gustafson/</div></div>';
+        html += '</div></div>';
 
         // Submissions table
         html += '<div class="admin-card"><h3 style="margin-top:0;">All Submissions (' + subs.length + ')</h3>';
@@ -478,6 +511,29 @@
             method: 'PUT', headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
             body: JSON.stringify({notes:notes})
           }).then(function(){ toast('Notes saved','success'); });
+        };
+
+        // Copy follow-up for score range
+        window.copyToClip = function(btn, type) {
+          var texts = {
+            hustle: 'HUSTLE MODE (4-9):\n\nAction Steps:\n1. Identify ONE task to delegate this month\n2. Calculate their true hourly rate\n3. Document top 5 weekly tasks — categorize as CEO Work / Delegate / Eliminate\n4. Schedule EWP consultation for Financial Architecture\n\nEWP Opportunity: Financial Architecture + Cash Flow Planning',
+            transition: 'IN TRANSITION (10-15):\n\nAction Steps:\n1. Map their CEO Calendar — target 60%+ on strategic work\n2. Build a delegation cost model (cost vs. freed-up value)\n3. Set 3 monthly KPIs: cash flow, profit margin, effective hourly rate\n4. Schedule EWP consultation for Pillar 2 (Financial Architecture)\n\nEWP Opportunity: Business Wealth Planning — ready to view the business as an asset',
+            ceo: 'CEO MODE (16-20):\n\nAction Steps:\n1. Optimize margins, reduce key-person dependency\n2. Model the business valuation (today vs. 3 years out)\n3. Build succession/exit readiness plan\n4. Schedule EWP consultation for Wealth Architecture + Valuation Planning\n\nEWP Opportunity: Full Business Valuation + Wealth Transfer Planning'
+          };
+          navigator.clipboard.writeText(texts[type] || '').then(function() {
+            btn.textContent = '✓ Copied!'; btn.style.color = '#27ae60';
+            setTimeout(function() { btn.textContent = 'Copy Follow-Up'; btn.style.color = ''; }, 2000);
+          });
+        };
+
+        // Copy email templates
+        window.copyTemplate = function(num) {
+          var el = document.getElementById('tmpl' + num);
+          if (!el) return;
+          var text = el.textContent.replace(/\\n/g, '\n');
+          navigator.clipboard.writeText(text).then(function() {
+            toast('Template copied to clipboard!', 'success');
+          });
         };
       });
     }).catch(function(err) {

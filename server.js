@@ -134,10 +134,14 @@ app.post('/api/submit', (req, res) => {
       'SUBMISSION', `${b.name} (${b.company}) — ${b.email}`, req.ip
     );
 
-    // Send confirmation email (non-blocking)
+    // Send confirmation email to participant (non-blocking)
     if (transporter) {
       sendConfirmation(b.email, b.name, b.delegationTask).catch(e => 
-        console.error('Email error:', e.message)
+        console.error('Confirmation email error:', e.message)
+      );
+      // Notify admin of new submission
+      sendAdminNotification(b).catch(e =>
+        console.error('Admin notification error:', e.message)
       );
     }
 
@@ -352,6 +356,44 @@ function generateInsights(row, pillarScores) {
   }
 
   return insights;
+}
+
+// ─── Admin Notification ──────────────────────────────────
+async function sendAdminNotification(b) {
+  if (!transporter) return;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return;
+  
+  const gapLabel = (b.ceoGapScore || 0) >= 16 ? '🟢 CEO Mode' : (b.ceoGapScore || 0) >= 10 ? '🟡 In Transition' : '🔴 Hustle Mode';
+  
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: adminEmail,
+    subject: `🚀 New Workshop Submission — ${b.name} (${b.company})`,
+    html: `
+      <div style="font-family:'Segoe UI',sans-serif;max-width:600px;margin:0 auto;color:#333;">
+        <div style="background:linear-gradient(135deg,#1a4d5c,#0099a1);padding:1.5rem;text-align:center;border-radius:8px 8px 0 0;">
+          <h2 style="color:#fff;margin:0;font-weight:300;">New Workshop Submission</h2>
+        </div>
+        <div style="padding:1.5rem;background:#fff;border:1px solid #e5e5e5;">
+          <h3 style="color:#1a4d5c;margin-top:0;">${b.name}</h3>
+          <table style="width:100%;font-size:0.95rem;border-collapse:collapse;">
+            <tr><td style="padding:6px 0;color:#888;width:140px;">Company</td><td style="padding:6px 0;font-weight:600;">${b.company}</td></tr>
+            <tr><td style="padding:6px 0;color:#888;">Email</td><td style="padding:6px 0;"><a href="mailto:${b.email}" style="color:#0099a1;">${b.email}</a></td></tr>
+            ${b.revenue ? `<tr><td style="padding:6px 0;color:#888;">Revenue</td><td style="padding:6px 0;font-weight:600;">$${Number(b.revenue).toLocaleString()}</td></tr>` : ''}
+            ${b.ceoGapScore ? `<tr><td style="padding:6px 0;color:#888;">CEO Gap Score</td><td style="padding:6px 0;font-weight:600;">${b.ceoGapScore}/20 ${gapLabel}</td></tr>` : ''}
+            ${b.biggestProblem ? `<tr><td style="padding:6px 0;color:#888;">Biggest Challenge</td><td style="padding:6px 0;">${b.biggestProblem}</td></tr>` : ''}
+            ${b.followUpInterest ? `<tr><td style="padding:6px 0;color:#888;">Follow-Up</td><td style="padding:6px 0;font-weight:600;color:#0099a1;">${b.followUpInterest.replace(/_/g, ' ')}</td></tr>` : ''}
+          </table>
+          ${b.delegationTask ? `<div style="background:#f0f8f9;padding:1rem;border-left:4px solid #0099a1;border-radius:4px;margin-top:1rem;"><strong>30-Day Commitment:</strong><br>${b.delegationTask}</div>` : ''}
+          <div style="margin-top:1.5rem;text-align:center;">
+            <a href="${process.env.APP_URL || 'https://your-railway-url'}/#admin" style="display:inline-block;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">View in Dashboard →</a>
+          </div>
+        </div>
+      </div>
+    `
+  });
+  console.log('✓ Admin notification sent to', adminEmail);
 }
 
 // ─── Email Helper ────────────────────────────────────────

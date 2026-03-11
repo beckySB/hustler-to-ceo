@@ -188,20 +188,38 @@
       s.pages.forEach(function(p) {
         bodyHtml += '<div class="page"><div class="page-header"><div class="page-title">' + p.title + '</div>' + (p.num ? '<div class="page-number">Page ' + p.num + '</div>' : '') + '</div>' + p.html + '</div>';
       });
+      // Bottom navigation buttons
+      bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding:1rem 0;">';
+      if (i > 0) {
+        bodyHtml += '<button class="btn btn-gold bottom-nav" data-section="' + sections[i-1].id + '" style="font-size:0.95rem;">← ' + sections[i-1].label + '</button>';
+      } else {
+        bodyHtml += '<div></div>';
+      }
+      if (i < sections.length - 1) {
+        bodyHtml += '<button class="btn btn-primary bottom-nav" data-section="' + sections[i+1].id + '" style="font-size:0.95rem;">' + sections[i+1].label + ' →</button>';
+      } else {
+        bodyHtml += '<div></div>';
+      }
+      bodyHtml += '</div>';
       bodyHtml += '</div>';
     });
 
     app.innerHTML = navHtml + bodyHtml;
 
-    // Nav clicks
+    // Nav clicks (top tabs + bottom buttons)
+    function navigateToSection(sectionId) {
+      app.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+      var targetBtn = app.querySelector('.nav-btn[data-section="' + sectionId + '"]');
+      if (targetBtn) targetBtn.classList.add('active');
+      app.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+      document.getElementById('sec-' + sectionId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
     app.querySelectorAll('.nav-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        app.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
-        btn.classList.add('active');
-        app.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-        document.getElementById('sec-' + btn.dataset.section).classList.add('active');
-        window.scrollTo(0, 0);
-      });
+      btn.addEventListener('click', function() { navigateToSection(btn.dataset.section); });
+    });
+    app.querySelectorAll('.bottom-nav').forEach(function(btn) {
+      btn.addEventListener('click', function() { navigateToSection(btn.dataset.section); });
     });
 
     // Gap score calc

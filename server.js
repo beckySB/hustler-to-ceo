@@ -26,6 +26,9 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Database ────────────────────────────────────────────
+const fs = require('fs');
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const dbPath = path.join(__dirname, 'data', 'workshop.db');
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');

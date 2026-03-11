@@ -387,7 +387,7 @@ async function sendAdminNotification(b) {
           </table>
           ${b.delegationTask ? `<div style="background:#f0f8f9;padding:1rem;border-left:4px solid #0099a1;border-radius:4px;margin-top:1rem;"><strong>30-Day Commitment:</strong><br>${b.delegationTask}</div>` : ''}
           <div style="margin-top:1.5rem;text-align:center;">
-            <a href="${process.env.APP_URL || 'https://your-railway-url'}/#admin" style="display:inline-block;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">View in Dashboard →</a>
+            <a href="${process.env.APP_URL || 'https://hustler-to-ceo-production.up.railway.app'}/#admin" style="display:inline-block;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">View in Dashboard →</a>
           </div>
         </div>
       </div>

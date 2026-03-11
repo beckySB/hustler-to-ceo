@@ -386,6 +386,9 @@ async function sendAdminNotification(b) {
             ${b.followUpInterest ? `<tr><td style="padding:6px 0;color:#888;">Follow-Up</td><td style="padding:6px 0;font-weight:600;color:#0099a1;">${b.followUpInterest.replace(/_/g, ' ')}</td></tr>` : ''}
           </table>
           ${b.delegationTask ? `<div style="background:#f0f8f9;padding:1rem;border-left:4px solid #0099a1;border-radius:4px;margin-top:1rem;"><strong>30-Day Commitment:</strong><br>${b.delegationTask}</div>` : ''}
+          <div style="background:linear-gradient(135deg,#fffbf0,#fff5e6);padding:1rem;border-left:4px solid #d4a574;border-radius:4px;margin-top:0.75rem;">
+            <strong style="color:#1a4d5c;">📅 Next Step:</strong> Schedule a Business Wealth Consultation with <a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="color:#0099a1;font-weight:600;">Eternal Wealth Partners</a> to build your personalized financial architecture.
+          </div>
           <div style="margin-top:1.5rem;text-align:center;">
             <a href="${process.env.APP_URL || 'https://hustler-to-ceo-production.up.railway.app'}/#admin" style="display:inline-block;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">View in Dashboard →</a>
           </div>
@@ -423,9 +426,13 @@ async function sendConfirmation(email, name, delegationTask) {
             <li><strong>Week 3:</strong> Implement the delegation or systemization</li>
             <li><strong>Week 4:</strong> Measure results and adjust</li>
           </ol>
+          <div style="background:linear-gradient(135deg,#fffbf0,#fff5e6);padding:1.5rem;border-left:4px solid #d4a574;border-radius:4px;margin:1.5rem 0;">
+            <p style="margin:0;font-weight:600;color:#1a4d5c;">📅 Your Next CEO Move:</p>
+            <p style="margin:0.5rem 0 0;">Set up a <strong>Business Wealth Consultation</strong> with Eternal Wealth Partners to build your personalized financial architecture — the bridge between where you are and where you want to be.</p>
+          </div>
           <div style="text-align:center;margin-top:2rem;padding:1.5rem;background:#f9f9f9;border-radius:8px;">
-            <p style="font-weight:600;color:#1a4d5c;">Want personalized guidance?</p>
-            <p>Reply to this email or book a 20-minute discovery call.</p>
+            <p style="font-weight:600;color:#1a4d5c;">Ready to build your financial architecture?</p>
+            <a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="display:inline-block;margin-top:0.75rem;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">Schedule Your EWP Consultation →</a>
           </div>
         </div>
         <div style="padding:1rem;text-align:center;font-size:0.85rem;color:#999;">

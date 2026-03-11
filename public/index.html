@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>From Hustler to CEO — Eternal Wealth Partners</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--navy:#1a4d5c;--teal:#0099a1;--gold:#d4a574;--light:#f5f5f5;--white:#fff;--text:#333;--danger:#e74c3c;--success:#27ae60}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;line-height:1.6;color:var(--text);background:var(--light)}
+    .header{background:linear-gradient(135deg,var(--navy) 0%,var(--teal) 100%);color:var(--white);padding:1.5rem 2rem;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.1);position:sticky;top:0;z-index:100}
+    .header h1{font-size:1.75rem;font-weight:300;letter-spacing:0.5px}
+    .header p{font-size:0.9rem;opacity:0.85;margin-top:0.25rem}
+    .container{max-width:900px;margin:0 auto;padding:2rem}
+    /* Nav */
+    .nav-tabs{display:flex;gap:0.5rem;margin-bottom:2rem;flex-wrap:wrap;background:var(--white);padding:1rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+    .nav-btn{padding:0.6rem 1.25rem;border:2px solid var(--navy);background:var(--white);color:var(--navy);cursor:pointer;border-radius:4px;font-weight:600;transition:all 0.2s;font-size:0.85rem}
+    .nav-btn:hover,.nav-btn.active{background:var(--navy);color:var(--white);border-color:var(--gold)}
+    /* Sections */
+    .section{display:none;animation:fadeIn 0.3s ease}.section.active{display:block}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    /* Cards */
+    .page{background:var(--white);padding:2rem;margin-bottom:1.5rem;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.08);border-left:4px solid var(--teal)}
+    .page-header{border-bottom:3px solid var(--gold);padding-bottom:0.75rem;margin-bottom:1.25rem}
+    .page-title{color:var(--navy);font-size:1.6rem;font-weight:300;letter-spacing:0.5px}
+    .page-number{color:var(--teal);font-size:0.85rem;font-weight:600;margin-top:0.25rem}
+    h2{color:var(--navy);font-size:1.4rem;margin:1.25rem 0 0.75rem;font-weight:400}
+    h3{color:var(--teal);font-size:1.1rem;margin:1.25rem 0 0.5rem;font-weight:600}
+    p{margin-bottom:0.75rem;line-height:1.7}
+    ul,ol{margin:0.75rem 0 0.75rem 1.5rem}li{margin-bottom:0.5rem}
+    /* Inputs */
+    .input-field{border:none;border-bottom:2px solid var(--teal);padding:0.5rem;font-size:1rem;color:var(--navy);background:rgba(0,153,161,0.04);width:100%;max-width:400px;transition:border-color 0.2s;outline:none;font-family:inherit}
+    .input-field:focus{border-bottom-color:var(--gold)}
+    textarea.input-field{min-height:80px;resize:vertical;border:1px solid rgba(0,153,161,0.2);border-radius:4px;width:100%;max-width:100%}
+    select.input-field{max-width:100%;cursor:pointer;appearance:auto}
+    .input-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap}
+    .input-label{font-weight:600;color:var(--navy);min-width:160px;font-size:0.9rem}
+    /* Table */
+    .table-container{overflow-x:auto;margin:1rem 0}
+    table{width:100%;border-collapse:collapse;font-size:0.9rem}
+    th{background:var(--navy);color:var(--white);padding:0.75rem;text-align:left;font-weight:500}
+    td{padding:0.6rem 0.75rem;border-bottom:1px solid #eee}
+    tr:hover td{background:rgba(0,153,161,0.03)}
+    table input[type="number"],table input[type="text"]{width:100%;border:none;border-bottom:1px solid #ddd;padding:4px;font-size:0.9rem;text-align:right;background:transparent}
+    table input:focus{border-bottom-color:var(--teal);outline:none}
+    /* Callout */
+    .callout{background:linear-gradient(135deg,#f0f8f9,#e8f5f7);padding:1.5rem;border-radius:8px;border-left:4px solid var(--teal);margin:1.25rem 0}
+    .permission-box{background:linear-gradient(135deg,#fffbf0,#fff5e6);padding:1.5rem;border-radius:8px;border-left:4px solid var(--gold);margin:1.25rem 0;font-size:1.05rem;font-style:italic;color:var(--navy)}
+    /* Checkbox */
+    .checkbox-group{margin:1rem 0}.checkbox-item{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:0.75rem;padding:0.75rem;background:rgba(0,153,161,0.03);border-radius:4px}
+    .checkbox-item input[type="checkbox"]{margin-top:4px;width:18px;height:18px;accent-color:var(--teal);flex-shrink:0}
+    /* Button */
+    .btn{padding:0.75rem 2rem;border:none;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.5rem}
+    .btn-primary{background:var(--teal);color:var(--white)}.btn-primary:hover{background:var(--navy)}
+    .btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover{background:#c4955d}
+    .btn-danger{background:var(--danger);color:var(--white);font-size:0.85rem;padding:0.5rem 1rem}
+    .btn-sm{font-size:0.8rem;padding:0.4rem 1rem}
+    .btn:disabled{opacity:0.5;cursor:not-allowed}
+    /* Insight cards */
+    .insight{padding:1rem;border-radius:8px;margin-bottom:0.75rem;border-left:4px solid}
+    .insight-critical{background:#fdf2f2;border-color:var(--danger)}.insight-critical .insight-title{color:var(--danger)}
+    .insight-warning{background:#fefce8;border-color:#f59e0b}.insight-warning .insight-title{color:#b45309}
+    .insight-success{background:#f0fdf4;border-color:var(--success)}.insight-success .insight-title{color:var(--success)}
+    .insight-info{background:#f0f8f9;border-color:var(--teal)}.insight-info .insight-title{color:var(--teal)}
+    .insight-action{background:#fffbf0;border-color:var(--gold)}.insight-action .insight-title{color:#92400e}
+    .insight-title{font-weight:700;font-size:0.95rem;margin-bottom:0.25rem}
+    .insight-text{font-size:0.875rem;color:#555}
+    /* Footer */
+    .footer{text-align:center;padding:2rem;color:#888;font-size:0.85rem;border-top:1px solid #e5e5e5;margin-top:3rem}
+    /* Toast */
+    .toast{position:fixed;top:1rem;right:1rem;padding:1rem 1.5rem;border-radius:8px;color:var(--white);font-weight:600;font-size:0.9rem;z-index:9999;animation:slideIn 0.3s ease;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+    .toast-success{background:var(--success)}.toast-error{background:var(--danger)}
+    @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    /* Progress */
+    .progress-bar{height:8px;background:rgba(0,0,0,0.08);border-radius:4px;overflow:hidden;margin:0.5rem 0}
+    .progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease}
+    /* Score ring */
+    .score-ring{width:120px;height:120px;position:relative;margin:0 auto}
+    .score-ring svg{transform:rotate(-90deg)}
+    .score-ring .score-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;font-weight:700;color:var(--navy)}
+    /* Admin */
+    .admin-card{background:var(--white);border-radius:8px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:1rem}
+    .admin-stat{text-align:center;padding:1rem}.admin-stat-value{font-size:2.5rem;font-weight:700;color:var(--teal)}.admin-stat-label{font-size:0.8rem;color:#888;margin-top:0.25rem}
+    .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .modal{background:var(--white);border-radius:12px;padding:2rem;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+    .modal h2{margin-bottom:1rem}
+    .hidden{display:none!important}
+    @media(max-width:768px){.container{padding:1rem}.page{padding:1.25rem}.grid-2{grid-template-columns:1fr}.header h1{font-size:1.3rem}.nav-btn{padding:0.5rem 0.75rem;font-size:0.75rem}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>From Hustler to CEO</h1>
+    <p>Financial Clarity Meets Operational Design</p>
+    <p style="font-size:0.75rem;opacity:0.6;margin-top:0.25rem;">Eternal Wealth Partners + Prime BAS</p>
+  </div>
+
+  <div class="container" id="app">
+    <!-- Filled by JS based on route -->
+  </div>
+
+  <div class="footer">
+    <p><strong>From Hustler to CEO: Financial Clarity Meets Operational Design</strong></p>
+    <p>Co-facilitated by Becky Gustafson (Eternal Wealth Partners) + Natalie Barranco (Prime BAS)</p>
+    <p style="margin-top:0.5rem;color:#bbb;">Women's Leadership Conference | New Orleans</p>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  var API = '';  // same origin
+  var app = document.getElementById('app');
+
+  // ─── Router ──────────────────────────────────
+  function route() {
+    var hash = location.hash.replace('#','') || 'workbook';
+    var parts = hash.split('/');
+    if (parts[0] === 'admin') renderAdmin();
+    else if (parts[0] === 'report') renderReport(parts[1] || '');
+    else renderWorkbook();
+  }
+  window.addEventListener('hashchange', route);
+
+  // ─── Toast ───────────────────────────────────
+  function toast(msg, type) {
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + (type || 'success');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 3500);
+  }
+
+  // ─── Workbook ────────────────────────────────
+  function renderWorkbook() {
+    var sections = [
+      { id:'foundation', label:'Foundation', pages: [
+        { title:'Welcome', num:1, html:'<p style="font-size:1.1rem;">Revenue isn\'t wealth. Margin is.<br>Hustle isn\'t strategy. Architecture is.</p><p>This workbook is designed for <strong>business owners ready to stop trading time for money</strong> and start building an asset that generates wealth independently of their personal effort.</p><div class="callout"><p><strong>What you\'ll walk away with:</strong></p><ul><li>A clear picture of your CEO Gap (where you are vs. where you need to be)</li><li>A framework for delegating and systematizing with financial clarity</li><li>A 30-day action plan tied to real financial impact</li><li>Permission to think like a CEO, not just a hustler</li></ul></div><div class="permission-box">The goal isn\'t to work harder. The goal is to build something worth more than your effort.</div>' },
+        { title:'The CEO Gap', num:3, html:'<p><strong>The gap between where you are and where you want to be isn\'t about revenue—it\'s about how your business operates.</strong></p><h3>Rate yourself (1-5):</h3><div class="table-container"><table><thead><tr><th>Area</th><th style="width:80px;">Score</th></tr></thead><tbody><tr><td>I can take 2 weeks off without revenue declining</td><td><input type="number" min="1" max="5" class="gap-score"></td></tr><tr><td>My business runs without me for daily operations</td><td><input type="number" min="1" max="5" class="gap-score"></td></tr><tr><td>I know my exact profit margin this month</td><td><input type="number" min="1" max="5" class="gap-score"></td></tr><tr><td>I have a documented financial roadmap (not just revenue goals)</td><td><input type="number" min="1" max="5" class="gap-score"></td></tr></tbody><tfoot><tr><td><strong>Total Score</strong></td><td><strong id="gapTotal">0</strong> / 20</td></tr></tfoot></table></div><div class="callout"><p><strong>16-20:</strong> You\'re operating like a CEO. Let\'s optimize.<br><strong>10-15:</strong> You\'re in transition. This workshop is for you.<br><strong>4-9:</strong> You\'re in hustle mode. Today is your inflection point.</p></div>' },
+      ]},
+      { id:'pillars', label:'Four Pillars', pages: [
+        { title:'The Four Pillars of a CEO Business', num:6, html:'<div class="callout"><p>Every business that scales without killing its owner has these four pillars in place.</p></div><h3>1. Operational Infrastructure</h3><p>Systems, processes, and people that run without you. The ops backbone.</p><h3>2. Financial Architecture</h3><p>Margin discipline, profit-first allocation, tax strategy, and reinvestment framework.</p><h3>3. Capital Alignment</h3><p>Where ops and finance speak the same language. Every operational investment has a financial model.</p><h3>4. Strategic Vision</h3><p>The 2-5 year plan that drives decisions. Not just "make more money" — build an asset.</p><div class="permission-box">The Hustler builds one pillar (usually ops). The CEO builds all four.</div>' },
+        { title:'Pillar Self-Assessment', num:7, html:'<p><strong>Rate your business on each pillar (1-5):</strong></p><div class="table-container"><table><thead><tr><th>Pillar</th><th style="width:80px;">Score</th></tr></thead><tbody><tr><td>Operational Infrastructure — Can your business operate without you for 2 weeks?</td><td><input type="number" min="1" max="5" class="pillar-score" data-pillar="ops"></td></tr><tr><td>Financial Architecture — Do you know your margin, cash flow, and reinvestment plan?</td><td><input type="number" min="1" max="5" class="pillar-score" data-pillar="finance"></td></tr><tr><td>Capital Alignment — Do your operational investments have financial models?</td><td><input type="number" min="1" max="5" class="pillar-score" data-pillar="capital"></td></tr><tr><td>Strategic Vision — Do you have a 2-5 year plan beyond "grow revenue"?</td><td><input type="number" min="1" max="5" class="pillar-score" data-pillar="vision"></td></tr></tbody><tfoot><tr><td><strong>Total</strong></td><td><strong id="pillarTotal">0</strong> / 20</td></tr></tfoot></table></div><div class="callout"><p><strong>16-20:</strong> Strong foundation. Fine-tune and optimize.<br><strong>10-15:</strong> Gaps exist. This workshop targets exactly where.<br><strong>4-9:</strong> Critical gaps. Start with the lowest-scoring pillar.</p></div>' },
+      ]},
+      { id:'calendar', label:'CEO Calendar', pages: [
+        { title:'The CEO Calendar Audit', num:9, html:'<p><strong>Where does your time actually go?</strong></p><p>List your top 5 recurring weekly tasks and categorize them:</p><div class="table-container"><table><thead><tr><th>Task</th><th style="width:90px;">Hours/wk</th><th style="width:120px;">Type</th></tr></thead><tbody><tr><td><input type="text" class="cal-task" placeholder="e.g., Client calls"></td><td><input type="number" class="cal-hours" min="0" max="60"></td><td><select class="cal-type input-field" style="max-width:120px"><option value="">Select</option><option>CEO Work</option><option>Delegate</option><option>Eliminate</option><option>Systematize</option></select></td></tr><tr><td><input type="text" class="cal-task" placeholder="e.g., Invoicing"></td><td><input type="number" class="cal-hours" min="0" max="60"></td><td><select class="cal-type input-field" style="max-width:120px"><option value="">Select</option><option>CEO Work</option><option>Delegate</option><option>Eliminate</option><option>Systematize</option></select></td></tr><tr><td><input type="text" class="cal-task" placeholder="e.g., Social media"></td><td><input type="number" class="cal-hours" min="0" max="60"></td><td><select class="cal-type input-field" style="max-width:120px"><option value="">Select</option><option>CEO Work</option><option>Delegate</option><option>Eliminate</option><option>Systematize</option></select></td></tr><tr><td><input type="text" class="cal-task" placeholder=""></td><td><input type="number" class="cal-hours" min="0" max="60"></td><td><select class="cal-type input-field" style="max-width:120px"><option value="">Select</option><option>CEO Work</option><option>Delegate</option><option>Eliminate</option><option>Systematize</option></select></td></tr><tr><td><input type="text" class="cal-task" placeholder=""></td><td><input type="number" class="cal-hours" min="0" max="60"></td><td><select class="cal-type input-field" style="max-width:120px"><option value="">Select</option><option>CEO Work</option><option>Delegate</option><option>Eliminate</option><option>Systematize</option></select></td></tr></tbody></table></div><div class="callout"><p><strong>The goal:</strong> At least 60% of your time should be CEO Work (strategy, relationships, vision). If it\'s below 40%, you\'re still in hustle mode.</p></div>' },
+      ]},
+      { id:'financial', label:'Financial Roadmap', pages: [
+        { title:'Your Financial Snapshot', num:12, html:'<h3>Current State</h3><div class="input-row"><span class="input-label">Annual Revenue:</span><span>$</span><input type="number" id="fRevenue" class="input-field" placeholder="500,000" style="max-width:200px"></div><div class="input-row"><span class="input-label">Annual Expenses:</span><span>$</span><input type="number" id="fExpenses" class="input-field" placeholder="400,000" style="max-width:200px"></div><div class="input-row"><span class="input-label">Number of Employees:</span><input type="number" id="fEmployees" class="input-field" placeholder="5" style="max-width:100px"></div><div class="input-row"><span class="input-label">Your Hours/Week:</span><input type="number" id="fHours" class="input-field" placeholder="55" style="max-width:100px"></div><div id="fCalcResults" style="margin-top:1.5rem;"></div><div class="callout" style="margin-top:1rem;"><p><strong>The $8/day principle:</strong> Saving just $8/day in operational waste = $2,920/year. Reinvested at 8% for 10 years = $46,000+. Margin discipline compounds.</p></div>' },
+        { title:'The CEO Financial Roadmap', num:14, html:'<p><strong>Map your 2-year transformation:</strong></p><div class="table-container"><table><thead><tr><th></th><th>Today</th><th>Year 1</th><th>Year 2</th></tr></thead><tbody><tr><td><strong>Revenue</strong></td><td>$<input type="number" class="road-input" data-field="rev-today" style="width:120px"></td><td>$<input type="number" class="road-input" data-field="rev-y1" style="width:120px"></td><td>$<input type="number" class="road-input" data-field="rev-y2" style="width:120px"></td></tr><tr><td><strong>Profit Margin</strong></td><td><input type="number" class="road-input" data-field="margin-today" style="width:60px">%</td><td><input type="number" class="road-input" data-field="margin-y1" style="width:60px">%</td><td><input type="number" class="road-input" data-field="margin-y2" style="width:60px">%</td></tr><tr><td><strong>Your Hours/Week</strong></td><td><input type="number" class="road-input" data-field="hrs-today" style="width:60px"></td><td><input type="number" class="road-input" data-field="hrs-y1" style="width:60px"></td><td><input type="number" class="road-input" data-field="hrs-y2" style="width:60px"></td></tr><tr><td><strong># of Tasks Delegated</strong></td><td><input type="number" class="road-input" data-field="del-today" style="width:60px"></td><td><input type="number" class="road-input" data-field="del-y1" style="width:60px"></td><td><input type="number" class="road-input" data-field="del-y2" style="width:60px"></td></tr></tbody></table></div><div class="callout"><p><strong>Notice:</strong> Revenue can stay the same in Year 1, but if margin improves from ops changes, profit grows. <em>That\'s the CEO shift.</em></p></div>' },
+      ]},
+      { id:'margin', label:'Margin Matters', pages: [
+        { title:'The Margin Matters Brief', num:15, html:'<div class="permission-box">Most business owners obsess over revenue. CEOs obsess over margin.</div><h3>The $8/Day Principle</h3><p>Finding $8/day in operational savings doesn\'t sound exciting. But:</p><ul><li>$8/day = <strong>$2,920/year</strong></li><li>Reinvested at 8% for 10 years = <strong>$46,000+</strong></li><li>Applied across 5 cost categories = <strong>$230,000+ in wealth created</strong></li></ul><h3>Where to Find Your $8/Day</h3><div class="table-container"><table><thead><tr><th>Category</th><th style="width:120px;">Monthly Savings</th></tr></thead><tbody><tr><td>Subscriptions & software you don\'t use</td><td>$<input type="number" class="margin-input" style="width:80px"></td></tr><tr><td>Over-staffed shifts or redundant roles</td><td>$<input type="number" class="margin-input" style="width:80px"></td></tr><tr><td>Vendor renegotiation</td><td>$<input type="number" class="margin-input" style="width:80px"></td></tr><tr><td>Process inefficiency (rework, delays)</td><td>$<input type="number" class="margin-input" style="width:80px"></td></tr><tr><td>Pricing adjustments (undercharging)</td><td>$<input type="number" class="margin-input" style="width:80px"></td></tr></tbody><tfoot><tr><td><strong>Total Monthly</strong></td><td><strong>$<span id="marginTotal">0</span></strong></td></tr></tfoot></table></div><div class="callout"><p>Annual impact: <strong>$<span id="marginAnnual">0</span></strong><br>10-year compounded (8%): <strong>$<span id="margin10yr">0</span></strong></p></div>' },
+      ]},
+      { id:'dashboard', label:'CEO Dashboard', pages: [
+        { title:'Your CEO Dashboard', num:17, html:'<p><strong>The three numbers you track monthly.</strong></p><h3>Monthly Cash Flow Target</h3><div class="input-row"><span class="input-label">Target:</span>$<input type="number" id="dCashTarget" class="input-field" style="max-width:180px"></div><h3>Profit Margin Target</h3><div class="input-row"><span class="input-label">Target:</span><input type="number" id="dMarginTarget" class="input-field" style="max-width:100px">%</div><h3>Effective Hourly Rate Target</h3><div class="input-row"><span class="input-label">Target:</span>$<input type="number" id="dHourlyTarget" class="input-field" style="max-width:180px"></div><div class="callout" style="margin-top:1.5rem;"><p><strong>These three numbers tell you if you\'re building wealth or just trading time.</strong></p></div>' },
+      ]},
+      { id:'commitment', label:'30-Day Commitment', pages: [
+        { title:'Your 30-Day CEO Commitment', num:18, html:'<p style="font-size:1.05rem;margin-bottom:1.5rem;"><strong>In the next 30 days, you\'re going to make one CEO move:</strong></p><h3>The Task You\'re Delegating or Systematizing</h3><textarea id="cTask" class="input-field" placeholder="Describe the specific task you\'re going to delegate or systematize..."></textarea><h3>Estimated Annual Cost of Delegation</h3><div class="input-row">$<input type="number" id="cCost" class="input-field" style="max-width:200px" placeholder="15,000"></div><h3>Expected Impact</h3><textarea id="cImpact" class="input-field" placeholder="What will this free you up to do? What\'s the financial upside?"></textarea><h3>Your Biggest Challenge Right Now</h3><select id="cProblem" class="input-field" style="max-width:100%"><option value="">Select your biggest challenge...</option><option>I don\'t know my real profit margin</option><option>I can\'t take time off without revenue dropping</option><option>I\'m doing work I should delegate but can\'t afford to</option><option>I don\'t have a financial roadmap beyond revenue goals</option><option>I know what to do but can\'t execute consistently</option><option>Other</option></select><div class="checkbox-group" style="margin-top:1.5rem;"><div class="checkbox-item"><input type="checkbox" id="cCheck1"><label><strong>I commit to delegating or systematizing this task in 30 days</strong></label></div><div class="checkbox-item"><input type="checkbox" id="cCheck2"><label><strong>I will model the financial impact of this change</strong></label></div></div>' },
+      ]},
+      { id:'submit', label:'✉ Submit', pages: [
+        { title:'Submit Your Workbook', num:'', html:'<div class="callout"><p><strong>Submit your workbook</strong> to receive your personalized CEO Action Report and stay connected for follow-up resources.</p></div><h3>Your Information</h3><div class="input-row"><span class="input-label">Full Name *</span><input type="text" id="sName" class="input-field" required></div><div class="input-row"><span class="input-label">Email *</span><input type="email" id="sEmail" class="input-field" required></div><div class="input-row"><span class="input-label">Company *</span><input type="text" id="sCompany" class="input-field" required></div><h3>Follow-Up Interest</h3><select id="sFollowUp" class="input-field" style="max-width:100%"><option value="">Select...</option><option value="discovery_call">20-minute discovery call with Becky</option><option value="group_coaching">Group coaching program</option><option value="email_only">Just email resources, please</option><option value="not_now">Not right now</option></select><div style="margin-top:2rem;text-align:center;"><button type="button" class="btn btn-primary" id="submitBtn" style="font-size:1.1rem;padding:1rem 3rem;">Submit My Workbook →</button><p id="submitStatus" style="margin-top:1rem;font-size:0.9rem;color:var(--teal);"></p></div>' },
+      ]},
+    ];
+
+    var navHtml = '<div class="nav-tabs">';
+    sections.forEach(function(s, i) {
+      navHtml += '<button class="nav-btn' + (i===0?' active':'') + '" data-section="' + s.id + '">' + s.label + '</button>';
+    });
+    navHtml += '</div>';
+
+    var bodyHtml = '';
+    sections.forEach(function(s, i) {
+      bodyHtml += '<div class="section' + (i===0?' active':'') + '" id="sec-' + s.id + '">';
+      s.pages.forEach(function(p) {
+        bodyHtml += '<div class="page"><div class="page-header"><div class="page-title">' + p.title + '</div>' + (p.num ? '<div class="page-number">Page ' + p.num + '</div>' : '') + '</div>' + p.html + '</div>';
+      });
+      bodyHtml += '</div>';
+    });
+
+    app.innerHTML = navHtml + bodyHtml;
+
+    // Nav clicks
+    app.querySelectorAll('.nav-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        app.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        app.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+        document.getElementById('sec-' + btn.dataset.section).classList.add('active');
+        window.scrollTo(0, 0);
+      });
+    });
+
+    // Gap score calc
+    app.addEventListener('input', function(e) {
+      if (e.target.classList.contains('gap-score')) {
+        var total = 0;
+        app.querySelectorAll('.gap-score').forEach(function(inp) { total += parseInt(inp.value) || 0; });
+        var el = document.getElementById('gapTotal');
+        if (el) el.textContent = total;
+      }
+      if (e.target.classList.contains('pillar-score')) {
+        var total = 0;
+        app.querySelectorAll('.pillar-score').forEach(function(inp) { total += parseInt(inp.value) || 0; });
+        var el = document.getElementById('pillarTotal');
+        if (el) el.textContent = total;
+      }
+      if (e.target.classList.contains('margin-input')) {
+        var total = 0;
+        app.querySelectorAll('.margin-input').forEach(function(inp) { total += parseFloat(inp.value) || 0; });
+        document.getElementById('marginTotal').textContent = total.toFixed(0);
+        document.getElementById('marginAnnual').textContent = (total * 12).toLocaleString();
+        var fv = 0; for (var y = 0; y < 10; y++) fv += (total * 12) * Math.pow(1.08, 10 - y);
+        document.getElementById('margin10yr').textContent = Math.round(fv).toLocaleString();
+      }
+      // Financial snapshot calc
+      if (e.target.id === 'fRevenue' || e.target.id === 'fExpenses' || e.target.id === 'fHours') {
+        var rev = parseFloat(document.getElementById('fRevenue').value) || 0;
+        var exp = parseFloat(document.getElementById('fExpenses').value) || 0;
+        var hrs = parseFloat(document.getElementById('fHours').value) || 0;
+        var profit = rev - exp;
+        var margin = rev > 0 ? (profit / rev * 100).toFixed(1) : 0;
+        var hourly = hrs > 0 ? (profit / (hrs * 50)).toFixed(0) : 0;
+        var el = document.getElementById('fCalcResults');
+        if (el) el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;"><div style="text-align:center;padding:1rem;background:rgba(0,153,161,0.05);border-radius:8px;"><div style="font-size:1.75rem;font-weight:700;color:var(--teal);">$' + profit.toLocaleString() + '</div><div style="font-size:0.8rem;color:#888;">Annual Profit</div></div><div style="text-align:center;padding:1rem;background:rgba(0,153,161,0.05);border-radius:8px;"><div style="font-size:1.75rem;font-weight:700;color:var(--navy);">' + margin + '%</div><div style="font-size:0.8rem;color:#888;">Profit Margin</div></div><div style="text-align:center;padding:1rem;background:rgba(0,153,161,0.05);border-radius:8px;"><div style="font-size:1.75rem;font-weight:700;color:' + (hourly < 50 ? 'var(--danger)' : 'var(--success)') + ';">$' + hourly + '</div><div style="font-size:0.8rem;color:#888;">Effective Hourly Rate</div></div></div>';
+      }
+    });
+
+    // Submit handler
+    document.getElementById('submitBtn').addEventListener('click', function() {
+      var name = document.getElementById('sName').value.trim();
+      var email = document.getElementById('sEmail').value.trim();
+      var company = document.getElementById('sCompany').value.trim();
+      if (!name || !email || !company) { toast('Please fill in name, email, and company.', 'error'); return; }
+
+      var pillarScores = {};
+      app.querySelectorAll('.pillar-score').forEach(function(inp) { pillarScores[inp.dataset.pillar] = parseInt(inp.value) || 0; });
+      var gapTotal = 0;
+      app.querySelectorAll('.gap-score').forEach(function(inp) { gapTotal += parseInt(inp.value) || 0; });
+
+      var payload = {
+        name: name, email: email, company: company,
+        revenue: parseFloat(document.getElementById('fRevenue')?.value) || 0,
+        employeeCount: parseInt(document.getElementById('fEmployees')?.value) || 0,
+        pillarScores: pillarScores,
+        ceoGapScore: gapTotal,
+        delegationTask: document.getElementById('cTask')?.value || '',
+        delegationCost: parseFloat(document.getElementById('cCost')?.value) || 0,
+        expectedImpact: document.getElementById('cImpact')?.value || '',
+        profitMarginTarget: parseFloat(document.getElementById('dMarginTarget')?.value) || 0,
+        hourlyRateTarget: parseFloat(document.getElementById('dHourlyTarget')?.value) || 0,
+        cashFlowTarget: parseFloat(document.getElementById('dCashTarget')?.value) || 0,
+        biggestProblem: document.getElementById('cProblem')?.value || '',
+        followUpInterest: document.getElementById('sFollowUp')?.value || ''
+      };
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      fetch(API + '/api/submit', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); }).then(function(d) {
+        if (d.success) {
+          toast('Submitted! Check your email for your action plan.', 'success');
+          document.getElementById('submitStatus').innerHTML = '✅ Submitted successfully! <a href="#report/' + encodeURIComponent(email) + '" style="color:var(--teal);font-weight:600;">View your personalized report →</a>';
+          btn.textContent = '✓ Submitted';
+        } else {
+          toast(d.error || 'Submission failed', 'error');
+          btn.disabled = false; btn.textContent = 'Submit My Workbook →';
+        }
+      }).catch(function(err) {
+        toast('Connection error: ' + err.message, 'error');
+        btn.disabled = false; btn.textContent = 'Submit My Workbook →';
+      });
+    });
+  }
+
+  // ─── Report ──────────────────────────────────
+  function renderReport(email) {
+    email = email || decodeURIComponent(prompt('Enter your email to view your report:') || '');
+    if (!email) { location.hash = 'workbook'; return; }
+
+    app.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--teal);">Loading your report...</div>';
+
+    fetch(API + '/api/my-report/' + encodeURIComponent(email)).then(function(r){ return r.json(); }).then(function(d) {
+      if (d.error) { app.innerHTML = '<div class="page"><h2>Report Not Found</h2><p>' + d.error + '</p><p><a href="#workbook">← Back to workbook</a></p></div>'; return; }
+
+      var html = '<div style="margin-bottom:1rem;"><a href="#workbook" style="color:var(--teal);font-weight:600;">← Back to workbook</a></div>';
+
+      // Hero
+      html += '<div class="page" style="border-left-color:var(--gold);text-align:center;"><h2 style="margin-top:0;">Your CEO Action Report</h2><p style="font-size:1.2rem;color:var(--navy);font-weight:600;">' + esc(d.name) + ' · ' + esc(d.company) + '</p>' + (d.revenue > 0 ? '<p style="color:var(--teal);">Revenue: $' + d.revenue.toLocaleString() + '</p>' : '') + '<p style="font-size:0.8rem;color:#999;">Generated ' + new Date(d.submittedAt).toLocaleDateString() + '</p></div>';
+
+      // CEO Gap Score Ring
+      var gap = d.ceoGapScore || 0;
+      var gapPct = Math.min(100, gap / 20 * 100);
+      var gapColor = gap >= 16 ? 'var(--success)' : gap >= 10 ? '#f59e0b' : 'var(--danger)';
+      html += '<div class="page"><h2 style="margin-top:0;">CEO Gap Score</h2><div class="score-ring"><svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="50" stroke="#eee" stroke-width="10" fill="none"/><circle cx="60" cy="60" r="50" stroke="' + gapColor + '" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="' + (2*Math.PI*50) + '" stroke-dashoffset="' + (2*Math.PI*50*(1-gapPct/100)) + '"/></svg><div class="score-val" style="color:' + gapColor + ';">' + gap + '</div></div><p style="text-align:center;margin-top:0.5rem;font-weight:600;color:' + gapColor + ';">' + (gap >= 16 ? 'CEO Mode' : gap >= 10 ? 'In Transition' : 'Hustle Mode') + '</p></div>';
+
+      // Pillar Scores
+      if (d.pillarScores && Object.keys(d.pillarScores).length > 0) {
+        html += '<div class="page"><h2 style="margin-top:0;">Pillar Assessment</h2>';
+        var pillarNames = {ops:'Operational Infrastructure',finance:'Financial Architecture',capital:'Capital Alignment',vision:'Strategic Vision'};
+        var pillarColors = {ops:'#0099a1',finance:'#1a4d5c',capital:'#d4a574',vision:'#27ae60'};
+        Object.keys(d.pillarScores).forEach(function(k) {
+          var v = d.pillarScores[k];
+          var pct = v / 5 * 100;
+          html += '<div style="margin-bottom:1rem;"><div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:0.25rem;"><span style="font-weight:600;">' + (pillarNames[k]||k) + '</span><span style="font-weight:700;color:' + (pillarColors[k]||'var(--teal)') + ';">' + v + '/5</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;background:' + (pillarColors[k]||'var(--teal)') + ';"></div></div></div>';
+        });
+        html += '</div>';
+      }
+
+      // Insights
+      if (d.insights && d.insights.length > 0) {
+        html += '<div class="page"><h2 style="margin-top:0;">Personalized Insights</h2>';
+        d.insights.forEach(function(ins) {
+          html += '<div class="insight insight-' + ins.type + '"><div class="insight-title">' + esc(ins.title) + '</div><div class="insight-text">' + esc(ins.text) + '</div></div>';
+        });
+        html += '</div>';
+      }
+
+      // 30-Day Commitment
+      if (d.delegationTask) {
+        html += '<div class="page" style="border-left-color:var(--gold);"><h2 style="margin-top:0;">Your 30-Day Commitment</h2><div class="callout"><p style="font-weight:600;">' + esc(d.delegationTask) + '</p></div>' + (d.delegationCost > 0 ? '<p><strong>Estimated cost:</strong> $' + d.delegationCost.toLocaleString() + '/year</p>' : '') + (d.expectedImpact ? '<p><strong>Expected impact:</strong> ' + esc(d.expectedImpact) + '</p>' : '') + '</div>';
+      }
+
+      // Targets
+      if (d.targets && (d.targets.cashFlow > 0 || d.targets.profitMargin > 0 || d.targets.hourlyRate > 0)) {
+        html += '<div class="page"><h2 style="margin-top:0;">Your CEO Dashboard Targets</h2><div class="grid-3">';
+        if (d.targets.cashFlow > 0) html += '<div style="text-align:center;padding:1rem;background:rgba(0,153,161,0.05);border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:var(--teal);">$' + d.targets.cashFlow.toLocaleString() + '</div><div style="font-size:0.8rem;color:#888;">Monthly Cash Flow</div></div>';
+        if (d.targets.profitMargin > 0) html += '<div style="text-align:center;padding:1rem;background:rgba(0,153,161,0.05);border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:var(--navy);">' + d.targets.profitMargin + '%</div><div style="font-size:0.8rem;color:#888;">Profit Margin</div></div>';
+        if (d.targets.hourlyRate > 0) html += '<div style="text-align:center;padding:1rem;background:rgba(0,153,161,0.05);border-radius:8px;"><div style="font-size:1.5rem;font-weight:700;color:var(--success);">$' + d.targets.hourlyRate.toLocaleString() + '</div><div style="font-size:0.8rem;color:#888;">Hourly Rate Target</div></div>';
+        html += '</div></div>';
+      }
+
+      // CTA
+      html += '<div class="page" style="text-align:center;border-left-color:var(--gold);"><h2 style="margin-top:0;">Ready for Your Next Step?</h2><p>The women who transform their businesses don\'t do it alone.</p><div style="margin:1.5rem 0;"><a href="mailto:becky@eternalwealthpartners.com?subject=Discovery Call — ' + encodeURIComponent(d.company) + '" class="btn btn-primary" style="text-decoration:none;">Book a Discovery Call with Becky</a></div><p style="font-size:0.85rem;color:#888;">Or email: becky@eternalwealthpartners.com</p></div>';
+
+      app.innerHTML = html;
+    }).catch(function(err) {
+      app.innerHTML = '<div class="page"><h2>Error</h2><p>' + err.message + '</p><p><a href="#workbook">← Back to workbook</a></p></div>';
+    });
+  }
+
+  // ─── Admin ───────────────────────────────────
+  function renderAdmin() {
+    var token = sessionStorage.getItem('admin_token');
+    if (!token) { renderAdminLogin(); return; }
+
+    app.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--teal);">Loading dashboard...</div>';
+
+    fetch(API + '/api/admin/analytics', { headers: {'Authorization': 'Bearer ' + token} })
+    .then(function(r){ if (r.status === 401) { sessionStorage.removeItem('admin_token'); renderAdminLogin(); throw new Error('auth'); } return r.json(); })
+    .then(function(analytics) {
+      return fetch(API + '/api/admin/submissions', { headers: {'Authorization': 'Bearer ' + token} })
+      .then(function(r){ return r.json(); })
+      .then(function(subData) {
+        var a = analytics;
+        var subs = subData.submissions || [];
+
+        var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem;"><h2 style="margin:0;">Admin Dashboard</h2><div style="display:flex;gap:0.5rem;"><a href="' + API + '/api/admin/export-csv" class="btn btn-sm btn-gold" style="text-decoration:none;" target="_blank">📊 Export CSV</a><button class="btn btn-sm btn-danger" onclick="sessionStorage.removeItem(\'admin_token\');location.hash=\'admin\';">Logout</button></div></div>';
+
+        // Stats
+        html += '<div class="grid-3" style="margin-bottom:1.5rem;">';
+        html += '<div class="admin-card admin-stat"><div class="admin-stat-value">' + a.total + '</div><div class="admin-stat-label">Total Submissions</div></div>';
+        html += '<div class="admin-card admin-stat"><div class="admin-stat-value">$' + (a.avgRevenue > 0 ? (a.avgRevenue/1000).toFixed(0) + 'K' : '—') + '</div><div class="admin-stat-label">Avg Revenue</div></div>';
+        html += '<div class="admin-card admin-stat"><div class="admin-stat-value">' + (a.avgGap > 0 ? a.avgGap.toFixed(1) : '—') + '</div><div class="admin-stat-label">Avg CEO Gap Score</div></div>';
+        html += '</div>';
+
+        // Charts
+        if (a.byInterest.length > 0 || a.byProblem.length > 0) {
+          html += '<div class="grid-2" style="margin-bottom:1.5rem;">';
+          if (a.byInterest.length > 0) {
+            html += '<div class="admin-card"><h3 style="margin-top:0;">Follow-Up Interest</h3>';
+            var maxI = Math.max.apply(null, a.byInterest.map(function(x){return x.count;}));
+            a.byInterest.forEach(function(x) {
+              html += '<div style="margin-bottom:0.5rem;"><div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:2px;"><span>' + esc(x.label) + '</span><span style="font-weight:600;">' + x.count + '</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + (x.count/maxI*100) + '%;background:var(--teal);"></div></div></div>';
+            });
+            html += '</div>';
+          }
+          if (a.byProblem.length > 0) {
+            html += '<div class="admin-card"><h3 style="margin-top:0;">Biggest Challenges</h3>';
+            var maxP = Math.max.apply(null, a.byProblem.map(function(x){return x.count;}));
+            a.byProblem.forEach(function(x) {
+              html += '<div style="margin-bottom:0.5rem;"><div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:2px;"><span>' + esc(x.label.substring(0,50)) + '</span><span style="font-weight:600;">' + x.count + '</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + (x.count/maxP*100) + '%;background:var(--gold);"></div></div></div>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+
+        // Submissions table
+        html += '<div class="admin-card"><h3 style="margin-top:0;">All Submissions (' + subs.length + ')</h3>';
+        if (subs.length > 0) {
+          html += '<div class="table-container"><table><thead><tr><th>Name</th><th>Company</th><th>Revenue</th><th>Gap</th><th>Interest</th><th>Date</th><th></th></tr></thead><tbody>';
+          subs.forEach(function(s) {
+            html += '<tr><td>' + esc(s.name) + '</td><td>' + esc(s.company) + '</td><td>$' + (s.revenue > 0 ? (s.revenue/1000).toFixed(0) + 'K' : '—') + '</td><td>' + (s.ceo_gap_score || '—') + '/20</td><td style="font-size:0.8rem;">' + esc(s.follow_up_interest || '—') + '</td><td style="font-size:0.8rem;">' + new Date(s.submitted_at).toLocaleDateString() + '</td><td><button class="btn btn-sm btn-primary" onclick="viewSubmission(' + s.id + ')">View</button></td></tr>';
+          });
+          html += '</tbody></table></div>';
+        } else {
+          html += '<p style="text-align:center;color:#999;padding:2rem;">No submissions yet. Share the workbook link!</p>';
+        }
+        html += '</div>';
+
+        app.innerHTML = html;
+
+        // Make viewSubmission global
+        window.viewSubmission = function(id) {
+          fetch(API + '/api/admin/submissions/' + id, { headers: {'Authorization': 'Bearer ' + token} })
+          .then(function(r){ return r.json(); }).then(function(s) {
+            var m = document.createElement('div');
+            m.className = 'modal-overlay';
+            m.onclick = function(e){ if(e.target===m) m.remove(); };
+            var ps = s.pillar_scores || {};
+            m.innerHTML = '<div class="modal"><div style="display:flex;justify-content:space-between;align-items:center;"><h2>' + esc(s.name) + '</h2><button class="btn btn-sm btn-danger" onclick="this.closest(\'.modal-overlay\').remove()">✕</button></div><p><strong>' + esc(s.company) + '</strong> · ' + esc(s.email) + '</p>' + (s.revenue > 0 ? '<p>Revenue: $' + s.revenue.toLocaleString() + '</p>' : '') + '<p>CEO Gap: <strong>' + (s.ceo_gap_score||0) + '/20</strong></p>' + (s.delegation_task ? '<div class="callout"><p><strong>30-Day Commitment:</strong> ' + esc(s.delegation_task) + '</p></div>' : '') + (s.biggest_problem ? '<p><strong>Challenge:</strong> ' + esc(s.biggest_problem) + '</p>' : '') + (s.expected_impact ? '<p><strong>Expected Impact:</strong> ' + esc(s.expected_impact) + '</p>' : '') + '<p><strong>Follow-Up:</strong> ' + esc(s.follow_up_interest || 'None') + '</p><hr style="margin:1rem 0;border:none;border-top:1px solid #eee;"><h3>Internal Notes</h3><textarea id="notesTxt" class="input-field" style="width:100%;max-width:100%;">' + esc(s.notes || '') + '</textarea><div style="margin-top:0.75rem;display:flex;gap:0.5rem;"><button class="btn btn-sm btn-primary" onclick="saveNotes(' + s.id + ')">Save Notes</button><a href="#report/' + encodeURIComponent(s.email) + '" class="btn btn-sm btn-gold" style="text-decoration:none;">View Report</a></div></div>';
+            document.body.appendChild(m);
+          });
+        };
+
+        window.saveNotes = function(id) {
+          var notes = document.getElementById('notesTxt').value;
+          fetch(API + '/api/admin/submissions/' + id, {
+            method: 'PUT', headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+            body: JSON.stringify({notes:notes})
+          }).then(function(){ toast('Notes saved','success'); });
+        };
+      });
+    }).catch(function(err) {
+      if (err.message !== 'auth') app.innerHTML = '<div class="page"><p style="color:var(--danger);">' + err.message + '</p></div>';
+    });
+  }
+
+  function renderAdminLogin() {
+    app.innerHTML = '<div style="max-width:400px;margin:3rem auto;"><div class="page" style="border-left-color:var(--gold);"><h2 style="margin-top:0;">Admin Login</h2><div class="input-row"><span class="input-label">Email</span><input type="email" id="aEmail" class="input-field"></div><div class="input-row"><span class="input-label">Password</span><input type="password" id="aPass" class="input-field"></div><div style="margin-top:1.5rem;text-align:center;"><button class="btn btn-primary" id="aLoginBtn">Login</button></div><p id="aError" style="color:var(--danger);text-align:center;margin-top:1rem;font-size:0.85rem;"></p></div></div>';
+
+    document.getElementById('aLoginBtn').addEventListener('click', function() {
+      var email = document.getElementById('aEmail').value;
+      var pass = document.getElementById('aPass').value;
+      fetch(API + '/api/admin/login', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:email,password:pass})
+      }).then(function(r){ return r.json(); }).then(function(d) {
+        if (d.success) {
+          sessionStorage.setItem('admin_token', d.token);
+          renderAdmin();
+        } else {
+          document.getElementById('aError').textContent = d.error || 'Invalid credentials';
+        }
+      }).catch(function(err) {
+        document.getElementById('aError').textContent = err.message;
+      });
+    });
+
+    document.getElementById('aPass').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('aLoginBtn').click();
+    });
+  }
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+  // Boot
+  route();
+})();
+</script>
+</body>
+</html>

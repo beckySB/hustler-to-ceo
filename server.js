@@ -144,7 +144,7 @@ app.post('/api/submit', (req, res) => {
 
     // Send confirmation email to participant (non-blocking)
     if (transporter) {
-      sendConfirmation(b.email, b.name, b.delegationTask).catch(e => 
+      sendConfirmation(b).catch(e => 
         console.error('Confirmation email error:', e.message)
       );
       // Notify admin of new submission
@@ -174,6 +174,11 @@ app.post('/api/submit', (req, res) => {
           b.biggestProblem || '', b.followUpInterest || '',
           JSON.stringify(b.workbookData || {}), b.email
         );
+        // Send emails on update too
+        if (transporter) {
+          sendConfirmation(b).catch(e => console.error('Confirmation email error:', e.message));
+          sendAdminNotification(b).catch(e => console.error('Admin notification error:', e.message));
+        }
         res.json({ success: true, updated: true });
       } catch (e2) {
         res.status(500).json({ error: 'Database error' });
@@ -407,53 +412,200 @@ async function sendAdminNotification(b) {
   console.log('✓ Admin notification sent to', adminEmail);
 }
 
-// ─── Email Helper ────────────────────────────────────────
-async function sendConfirmation(email, name, delegationTask) {
+// ─── Email Helper — Full Report Email ────────────────────
+async function sendConfirmation(b) {
   if (!transporter) return;
+  const email = b.email;
+  const name = b.name || 'there';
+  const company = b.company || '';
+  const gap = b.ceoGapScore || 0;
+  const pillarScores = b.pillarScores || {};
+  const delegationTask = b.delegationTask || '';
+  const delegationCost = b.delegationCost || 0;
+  const expectedImpact = b.expectedImpact || '';
+  const revenue = b.revenue || 0;
+  const profitMargin = b.profitMarginTarget || 0;
+  const hourlyRate = b.hourlyRateTarget || 0;
+  const cashFlow = b.cashFlowTarget || 0;
+  const reportUrl = `https://hustler-to-ceo-production.up.railway.app/#report/${encodeURIComponent(email)}`;
+
+  // Score-driven content
+  const gapColor = gap >= 16 ? '#22c55e' : gap >= 10 ? '#f59e0b' : '#ef4444';
+  const gapLabel = gap >= 16 ? '🟢 CEO Mode' : gap >= 10 ? '🟡 In Transition' : '🔴 Hustle Mode';
+  const gapPct = Math.round(Math.min(100, gap / 20 * 100));
+
+  // Pillar analysis
+  const pillarNames = { ops: 'Operational Infrastructure', finance: 'Financial Architecture', capital: 'Capital Alignment', vision: 'Strategic Vision' };
+  const pillarColors = { ops: '#0099a1', finance: '#1a4d5c', capital: '#d4a574', vision: '#27ae60' };
+  const pillarEmojis = { ops: '⚙️', finance: '💰', capital: '🔗', vision: '🎯' };
+
+  // Find weakest and strongest pillars
+  const pillarEntries = Object.entries(pillarScores).filter(([k,v]) => v > 0);
+  const weakest = pillarEntries.length > 0 ? pillarEntries.reduce((a, b) => a[1] < b[1] ? a : b) : null;
+  const strongest = pillarEntries.length > 0 ? pillarEntries.reduce((a, b) => a[1] > b[1] ? a : b) : null;
+  const pillarTotal = pillarEntries.reduce((sum, [k,v]) => sum + v, 0);
+
+  // Score-specific 30-day plan
+  let plan30Day = '';
+  if (gap < 10) {
+    plan30Day = `
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 1 — Foundation</strong><br><span style="color:#555;">Audit where you spend your time. Track every task for 5 business days. Identify the top 3 tasks that don't require YOUR specific expertise.</span></td></tr>
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 2 — Financial Clarity</strong><br><span style="color:#555;">Calculate your true hourly rate (take-home ÷ hours worked). Then calculate the cost of each task you identified. If your rate is $200/hr and you're doing $25/hr work — that's the gap.</span></td></tr>
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 3 — First Delegation</strong><br><span style="color:#555;">Pick ONE task from your list. Document the process (video yourself doing it). ${delegationTask ? 'Your chosen task: <em>' + delegationTask + '</em>.' : 'Choose the task that frees the most high-value hours.'} Hand it off — imperfectly is fine.</span></td></tr>
+      <tr><td style="padding:12px 16px;"><strong style="color:#0099a1;">Week 4 — Measure & Meet</strong><br><span style="color:#555;">How many hours did you reclaim? What did you do with them? Schedule a <strong>Business Wealth Consultation</strong> with Becky or Natalie to build your financial architecture around this new reality.</span></td></tr>`;
+  } else if (gap < 16) {
+    plan30Day = `
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 1 — Systems Audit</strong><br><span style="color:#555;">You've started the transition. Now identify which of the 4 pillars is weakest${weakest ? ' (your data says: <em>' + pillarNames[weakest[0]] + '</em>)' : ''}. Map the gap between current state and "runs without you."</span></td></tr>
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 2 — Financial Model</strong><br><span style="color:#555;">${delegationTask ? 'Model the ROI of your commitment: <em>' + delegationTask + '</em>. ' : ''}Build a simple model: cost of delegation vs. revenue from freed hours. ${profitMargin > 0 ? 'Your margin target of ' + profitMargin + '% should guide every investment decision.' : 'Define your target profit margin — this becomes your decision filter.'}</span></td></tr>
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 3 — Execute & Systematize</strong><br><span style="color:#555;">Implement your delegation plan. Document the process so it's repeatable. ${strongest ? 'Leverage your strength in <em>' + pillarNames[strongest[0]] + '</em> to compensate while you build the weaker areas.' : ''}</span></td></tr>
+      <tr><td style="padding:12px 16px;"><strong style="color:#0099a1;">Week 4 — Strategic Planning Session</strong><br><span style="color:#555;">Book a <strong>Business Wealth Consultation</strong> to turn your operational improvements into a financial strategy. You're close to CEO Mode — the right architecture accelerates the transition.</span></td></tr>`;
+  } else {
+    plan30Day = `
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 1 — Optimization Audit</strong><br><span style="color:#555;">You're in CEO Mode. Now the question becomes: what's the next level? ${weakest ? 'Your data shows <em>' + pillarNames[weakest[0]] + '</em> has the most room for growth.' : 'Identify the one area that would unlock the most enterprise value.'}</span></td></tr>
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 2 — Valuation Thinking</strong><br><span style="color:#555;">Start thinking about your business as an asset, not just a job. What's it worth today? What could it be worth in 3 years? ${revenue > 0 ? 'At $' + revenue.toLocaleString() + ' in revenue, ' : ''}Every system you build increases the multiple.</span></td></tr>
+      <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;"><strong style="color:#0099a1;">Week 3 — Scale Architecture</strong><br><span style="color:#555;">${delegationTask ? 'Your commitment — <em>' + delegationTask + '</em> — is a scaling move. ' : ''}Build the financial model for your next hire or system investment. CEOs invest ahead of growth.</span></td></tr>
+      <tr><td style="padding:12px 16px;"><strong style="color:#0099a1;">Week 4 — Wealth Strategy Session</strong><br><span style="color:#555;">You've earned a more sophisticated conversation. Schedule a <strong>Business Wealth Consultation</strong> to discuss tax strategy, asset protection, and building personal wealth from your business success.</span></td></tr>`;
+  }
+
+  // Pillar bars HTML
+  let pillarBarsHtml = '';
+  if (pillarEntries.length > 0) {
+    pillarBarsHtml = pillarEntries.map(([k, v]) => {
+      const pct = Math.round(v / 5 * 100);
+      const color = pillarColors[k] || '#0099a1';
+      const emoji = pillarEmojis[k] || '📊';
+      return `<tr><td style="padding:8px 16px;border-bottom:1px solid #f5f5f5;width:45%;font-weight:600;font-size:0.9rem;">${emoji} ${pillarNames[k] || k}</td><td style="padding:8px 16px;border-bottom:1px solid #f5f5f5;"><div style="background:#f0f0f0;border-radius:20px;height:20px;overflow:hidden;"><div style="background:${color};height:100%;width:${pct}%;border-radius:20px;min-width:20px;"></div></div></td><td style="padding:8px 16px;border-bottom:1px solid #f5f5f5;text-align:right;font-weight:700;color:${color};width:50px;">${v}/5</td></tr>`;
+    }).join('');
+  }
+
+  // Targets section
+  let targetsHtml = '';
+  if (cashFlow > 0 || profitMargin > 0 || hourlyRate > 0) {
+    const items = [];
+    if (cashFlow > 0) items.push(`<td style="text-align:center;padding:16px;"><div style="font-size:1.8rem;font-weight:700;color:#0099a1;">$${cashFlow.toLocaleString()}</div><div style="font-size:0.75rem;color:#888;margin-top:2px;">Monthly Cash Flow</div></td>`);
+    if (profitMargin > 0) items.push(`<td style="text-align:center;padding:16px;"><div style="font-size:1.8rem;font-weight:700;color:#1a4d5c;">${profitMargin}%</div><div style="font-size:0.75rem;color:#888;margin-top:2px;">Profit Margin</div></td>`);
+    if (hourlyRate > 0) items.push(`<td style="text-align:center;padding:16px;"><div style="font-size:1.8rem;font-weight:700;color:#27ae60;">$${hourlyRate.toLocaleString()}</div><div style="font-size:0.75rem;color:#888;margin-top:2px;">Hourly Rate</div></td>`);
+    targetsHtml = `<table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;"><tr>${items.join('')}</tr></table>`;
+  }
+
+  // Score-specific insight
+  let insightHtml = '';
+  if (gap < 10 && weakest) {
+    insightHtml = `<p style="background:#fff5f5;padding:12px 16px;border-left:4px solid #ef4444;border-radius:4px;font-size:0.9rem;">⚡ <strong>Priority Focus:</strong> Your ${pillarNames[weakest[0]]} score of ${weakest[1]}/5 is your biggest opportunity. Improving this one area will have the largest impact on breaking out of Hustle Mode.</p>`;
+  } else if (gap < 16 && weakest) {
+    insightHtml = `<p style="background:#fffbeb;padding:12px 16px;border-left:4px solid #f59e0b;border-radius:4px;font-size:0.9rem;">🔑 <strong>Key Insight:</strong> You're in transition. Your strongest pillar is ${pillarNames[strongest[0]]} (${strongest[1]}/5) — use it as leverage. Focus on bringing ${pillarNames[weakest[0]]} (${weakest[1]}/5) up to match.</p>`;
+  } else if (gap >= 16) {
+    insightHtml = `<p style="background:#f0fdf4;padding:12px 16px;border-left:4px solid #22c55e;border-radius:4px;font-size:0.9rem;">🏆 <strong>CEO Mode Insight:</strong> You're operating at a high level. ${pillarTotal >= 16 ? 'Your pillar scores reflect strong infrastructure across the board.' : weakest ? 'Optimizing ' + pillarNames[weakest[0]] + ' from ' + weakest[1] + '/5 could be your next multiplier.' : 'Focus on building enterprise value and wealth strategy.'}</p>`;
+  }
+
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
-    subject: 'Your 30-Day CEO Action Plan — Eternal Wealth Partners',
+    subject: `${name}, your CEO Action Report is ready — ${gapLabel}`,
     html: `
-      <div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;color:#333;">
-        <div style="background:linear-gradient(135deg,#1a4d5c,#0099a1);padding:2rem;text-align:center;border-radius:8px 8px 0 0;">
-          <h1 style="color:#fff;font-weight:300;margin:0;">From Hustler to CEO</h1>
-          <p style="color:rgba(255,255,255,0.8);margin-top:0.5rem;">Your personalized action plan</p>
+      <div style="font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;max-width:620px;margin:0 auto;color:#333;line-height:1.6;">
+        
+        <!-- HEADER -->
+        <div style="background:linear-gradient(135deg,#1a4d5c 0%,#0099a1 100%);padding:2.5rem 2rem;text-align:center;border-radius:10px 10px 0 0;">
+          <div style="font-size:2rem;margin-bottom:0.25rem;">👑</div>
+          <h1 style="color:#fff;font-weight:300;margin:0;font-size:1.6rem;">From Hustler to CEO</h1>
+          <p style="color:rgba(255,255,255,0.75);margin:0.5rem 0 0;font-size:0.9rem;">Your Personalized CEO Action Report</p>
         </div>
-        <div style="padding:2rem;background:#fff;border:1px solid #e5e5e5;">
-          <h2 style="color:#1a4d5c;">Hi ${name},</h2>
-          <p>Thank you for investing time in your business transformation at the Women's Leadership Conference.</p>
-          ${delegationTask ? `<div style="background:#f0f8f9;padding:1.5rem;border-left:4px solid #0099a1;border-radius:4px;margin:1.5rem 0;">
-            <p style="margin:0;font-weight:600;color:#1a4d5c;">Your 30-Day Commitment:</p>
-            <p style="margin:0.5rem 0 0;">${delegationTask}</p>
+
+        <!-- BODY -->
+        <div style="padding:0;background:#fff;border:1px solid #e5e5e5;border-top:none;">
+          
+          <!-- Greeting -->
+          <div style="padding:2rem 2rem 1rem;">
+            <h2 style="color:#1a4d5c;margin:0 0 0.25rem;font-size:1.3rem;">Hi ${name},</h2>
+            <p style="color:#555;margin:0;font-size:0.9rem;">${company}${revenue > 0 ? ' · $' + revenue.toLocaleString() + ' revenue' : ''}</p>
+            <p style="margin:1rem 0 0;">Thank you for investing in your business transformation. Below is your complete CEO Action Report with personalized insights and your custom 30-day plan.</p>
+          </div>
+
+          <!-- CEO GAP SCORE -->
+          <div style="padding:1.5rem 2rem;text-align:center;border-top:1px solid #f0f0f0;">
+            <h3 style="color:#1a4d5c;margin:0 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.1em;">CEO Gap Score</h3>
+            <div style="display:inline-block;width:120px;height:120px;border-radius:50%;border:8px solid ${gapColor};text-align:center;line-height:104px;">
+              <span style="font-size:2.5rem;font-weight:700;color:${gapColor};">${gap}</span><span style="font-size:0.9rem;color:#999;">/20</span>
+            </div>
+            <p style="margin:0.75rem 0 0;font-weight:700;font-size:1.1rem;color:${gapColor};">${gapLabel.replace(/🟢|🟡|🔴/g,'').trim()}</p>
+            <p style="margin:0.25rem 0 0;font-size:0.8rem;color:#999;">${gap >= 16 ? 'You\'re operating like a CEO. Let\'s optimize and build wealth.' : gap >= 10 ? 'You\'re in transition — the right moves now will transform your business.' : 'You\'re in hustle mode. Today is your inflection point.'}</p>
+          </div>
+
+          ${insightHtml ? `<div style="padding:0 2rem 1rem;">${insightHtml}</div>` : ''}
+
+          <!-- PILLAR SCORES -->
+          ${pillarBarsHtml ? `
+          <div style="padding:1.5rem 2rem;border-top:1px solid #f0f0f0;">
+            <h3 style="color:#1a4d5c;margin:0 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.1em;">Four Pillar Assessment</h3>
+            <table width="100%" cellpadding="0" cellspacing="0">${pillarBarsHtml}</table>
+            <p style="text-align:center;margin:1rem 0 0;font-weight:600;color:#1a4d5c;">Overall: ${pillarTotal}/20</p>
           </div>` : ''}
-          <div style="text-align:center;margin:1.5rem 0;">
-            <a href="https://hustler-to-ceo-production.up.railway.app/#report/${encodeURIComponent(email)}" style="display:inline-block;padding:0.75rem 2rem;background:#1a4d5c;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">📊 View Your Personalized CEO Report →</a>
+
+          <!-- TARGETS -->
+          ${targetsHtml ? `
+          <div style="padding:1.5rem 2rem;border-top:1px solid #f0f0f0;">
+            <h3 style="color:#1a4d5c;margin:0 0 0.5rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.1em;">Your CEO Dashboard Targets</h3>
+            ${targetsHtml}
+          </div>` : ''}
+
+          <!-- 30-DAY COMMITMENT -->
+          ${delegationTask ? `
+          <div style="padding:1.5rem 2rem;border-top:1px solid #f0f0f0;">
+            <h3 style="color:#1a4d5c;margin:0 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.1em;">Your 30-Day Commitment</h3>
+            <div style="background:#f0f8f9;padding:1.25rem;border-left:4px solid #0099a1;border-radius:4px;">
+              <p style="margin:0;font-weight:600;color:#1a4d5c;font-size:1rem;">${delegationTask}</p>
+              ${delegationCost > 0 ? `<p style="margin:0.5rem 0 0;font-size:0.85rem;color:#555;">Estimated cost: <strong>$${delegationCost.toLocaleString()}/year</strong></p>` : ''}
+              ${expectedImpact ? `<p style="margin:0.25rem 0 0;font-size:0.85rem;color:#555;">Expected impact: <strong>${expectedImpact}</strong></p>` : ''}
+            </div>
+          </div>` : ''}
+
+          <!-- 30-DAY PLAN -->
+          <div style="padding:1.5rem 2rem;border-top:1px solid #f0f0f0;">
+            <h3 style="color:#1a4d5c;margin:0 0 1rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.1em;">Your Personalized 30-Day Plan</h3>
+            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;">
+              ${plan30Day}
+            </table>
           </div>
-          <h3 style="color:#0099a1;">Your Next 30 Days:</h3>
-          <ol style="line-height:2;">
-            <li><strong>This week:</strong> Document the task and map the transition plan</li>
-            <li><strong>Next week:</strong> Model the financial impact (hours freed vs. cost)</li>
-            <li><strong>Week 3:</strong> Implement the delegation or systemization</li>
-            <li><strong>Week 4:</strong> Measure results and adjust</li>
-          </ol>
-          <div style="background:linear-gradient(135deg,#fffbf0,#fff5e6);padding:1.5rem;border-left:4px solid #d4a574;border-radius:4px;margin:1.5rem 0;">
-            <p style="margin:0;font-weight:600;color:#1a4d5c;">📅 Your Next CEO Move:</p>
-            <p style="margin:0.5rem 0 0;">Set up a <strong>Business Wealth Consultation</strong> with Eternal Wealth Partners to build your personalized financial architecture — the bridge between where you are and where you want to be.</p>
+
+          <!-- VIEW FULL REPORT -->
+          <div style="padding:1.5rem 2rem;text-align:center;border-top:1px solid #f0f0f0;">
+            <a href="${reportUrl}" style="display:inline-block;padding:0.85rem 2.5rem;background:#1a4d5c;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:1rem;">📊 View Full Interactive Report →</a>
+            <p style="margin:0.75rem 0 0;font-size:0.8rem;color:#999;">Access your report anytime. Save or print from the web.</p>
           </div>
-          <div style="text-align:center;margin-top:2rem;padding:1.5rem;background:#f9f9f9;border-radius:8px;">
-            <p style="font-weight:600;color:#1a4d5c;">Ready to build your financial architecture?</p>
-            <a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="display:inline-block;margin-top:0.75rem;padding:0.75rem 2rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">Schedule Your EWP Consultation →</a>
+
+          <!-- NEXT STEPS CTA -->
+          <div style="padding:2rem;border-top:1px solid #f0f0f0;background:linear-gradient(135deg,#fffbf0,#fff5e6);">
+            <h3 style="color:#1a4d5c;margin:0 0 0.75rem;font-size:1.05rem;">📅 Your Next CEO Move</h3>
+            <p style="margin:0 0 1rem;font-size:0.9rem;color:#555;">The women who transform their businesses don't do it alone. Whether you need financial architecture or operational design, your next conversation is the bridge between where you are and where you want to be.</p>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding:8px;text-align:center;width:50%;">
+                  <a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="display:block;padding:0.75rem 1rem;background:#0099a1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:0.85rem;">💎 Financial Strategy<br><span style="font-weight:400;font-size:0.75rem;opacity:0.85;">with Becky Gustafson</span></a>
+                </td>
+                <td style="padding:8px;text-align:center;width:50%;">
+                  <a href="https://primebas.com/" style="display:block;padding:0.75rem 1rem;background:#d4a574;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:0.85rem;">⚙️ Operational Design<br><span style="font-weight:400;font-size:0.75rem;opacity:0.85;">with Natalie Barranco</span></a>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:1rem 0 0;font-size:0.8rem;color:#888;text-align:center;">
+              <strong>Becky Gustafson</strong> — Wealth Management, Tax Strategy, Business Valuation<br>
+              <strong>Natalie Barranco</strong> — Business Operations, Systems, Scaling
+            </p>
           </div>
+
         </div>
-        <div style="padding:1rem;text-align:center;font-size:0.85rem;color:#999;">
-          <p><a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="color:#0099a1;">Becky Gustafson</a> | Eternal Wealth Partners</p>
-          <p><a href="https://primebas.com/" style="color:#0099a1;">Natalie Barranco</a> | Prime BAS</p>
+
+        <!-- FOOTER -->
+        <div style="padding:1.25rem;text-align:center;font-size:0.78rem;color:#999;border-top:1px solid #e5e5e5;">
+          <p style="margin:0;">From Hustler to CEO — Women's Leadership Workshop</p>
+          <p style="margin:0.25rem 0 0;"><a href="https://www.northwesternmutual.com/financial/advisor/becky-gustafson/" style="color:#0099a1;text-decoration:none;">Becky Gustafson, CFP® | Eternal Wealth Partners</a></p>
+          <p style="margin:0.25rem 0 0;"><a href="https://primebas.com/" style="color:#d4a574;text-decoration:none;">Natalie Barranco | Prime BAS</a></p>
         </div>
       </div>
     `
   });
-  console.log('✓ Confirmation email sent to', email);
+  console.log('✓ Full report email sent to', email);
 }
 
 // ─── 7-Day Follow-Up Email ────────────────────────────────

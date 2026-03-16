@@ -35,6 +35,9 @@ const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
+// Track DB creation time for admin visibility
+const DB_CREATED = new Date().toISOString();
+
 // Create tables
 db.exec(`
   CREATE TABLE IF NOT EXISTS submissions (
@@ -70,9 +73,23 @@ db.exec(`
     ip_address TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS email_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    submission_id INTEGER,
+    email_to TEXT NOT NULL,
+    email_type TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'sent',
+    error_message TEXT,
+    sent_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 console.log('✓ Database connected:', dbPath);
+console.log('  Volume path:', process.env.RAILWAY_VOLUME_MOUNT_PATH || '(local — NOT PERSISTENT ON RAILWAY)');
+if (!process.env.RAILWAY_VOLUME_MOUNT_PATH && process.env.RAILWAY_ENVIRONMENT) {
+  console.log('  ⚠️  WARNING: No RAILWAY_VOLUME_MOUNT_PATH set! DB will be lost on redeploy!');
+}
 
 // ─── Email (optional — works without it) ─────────────────
 let transporter = null;
@@ -144,13 +161,18 @@ app.post('/api/submit', (req, res) => {
 
     // Send confirmation email to participant (non-blocking)
     if (transporter) {
-      sendConfirmation(b).catch(e => 
-        console.error('Confirmation email error:', e.message)
-      );
+      sendConfirmation(b).catch(e => {
+        console.error('Confirmation email error:', e.message);
+        try { db.prepare('INSERT INTO email_log (email_to, email_type, status, error_message) VALUES (?,?,?,?)').run(b.email, 'report', 'failed', e.message); } catch(e2){}
+      });
       // Notify admin of new submission
-      sendAdminNotification(b).catch(e =>
-        console.error('Admin notification error:', e.message)
-      );
+      sendAdminNotification(b).catch(e => {
+        console.error('Admin notification error:', e.message);
+        try { db.prepare('INSERT INTO email_log (email_to, email_type, status, error_message) VALUES (?,?,?,?)').run(ADMIN_EMAIL, 'admin_notification', 'failed', e.message); } catch(e2){}
+      });
+    } else {
+      console.log('⚠️  No email transporter — emails NOT sent for', b.email);
+      try { db.prepare('INSERT INTO email_log (email_to, email_type, status, error_message) VALUES (?,?,?,?)').run(b.email, 'report', 'skipped', 'No transporter configured'); } catch(e2){}
     }
 
     res.json({ success: true, id: result.lastInsertRowid });
@@ -224,6 +246,34 @@ app.get('/api/my-report/:email', (req, res) => {
 // ═══════════════════════════════════════════════════════════
 // ADMIN API
 // ═══════════════════════════════════════════════════════════
+
+// GET /api/health — Public health check
+app.get('/api/health', (req, res) => {
+  const total = db.prepare('SELECT count(*) as c FROM submissions').get().c;
+  const lastSubmission = db.prepare('SELECT submitted_at FROM submissions ORDER BY submitted_at DESC LIMIT 1').get();
+  const emailsSent = db.prepare("SELECT count(*) as c FROM email_log WHERE status='sent'").get().c;
+  const emailsFailed = db.prepare("SELECT count(*) as c FROM email_log WHERE status='failed'").get().c;
+  const emailsSkipped = db.prepare("SELECT count(*) as c FROM email_log WHERE status='skipped'").get().c;
+  res.json({
+    status: 'ok',
+    dbPath,
+    volumeMounted: !!process.env.RAILWAY_VOLUME_MOUNT_PATH,
+    volumePath: process.env.RAILWAY_VOLUME_MOUNT_PATH || null,
+    isRailway: !!process.env.RAILWAY_ENVIRONMENT,
+    dbCreatedThisDeploy: DB_CREATED,
+    totalSubmissions: total,
+    lastSubmission: lastSubmission ? lastSubmission.submitted_at : null,
+    emailTransporterActive: !!transporter,
+    emailUser: process.env.EMAIL_USER || null,
+    emails: { sent: emailsSent, failed: emailsFailed, skipped: emailsSkipped }
+  });
+});
+
+// GET /api/admin/email-log — Email delivery log
+app.get('/api/admin/email-log', authenticateAdmin, (req, res) => {
+  const rows = db.prepare('SELECT * FROM email_log ORDER BY sent_at DESC LIMIT 100').all();
+  res.json({ emails: rows });
+});
 
 // POST /api/admin/login
 app.post('/api/admin/login', (req, res) => {
@@ -410,6 +460,7 @@ async function sendAdminNotification(b) {
     `
   });
   console.log('✓ Admin notification sent to', adminEmail);
+  try { db.prepare('INSERT INTO email_log (email_to, email_type, status) VALUES (?,?,?)').run(adminEmail, 'admin_notification', 'sent'); } catch(e){}
 }
 
 // ─── Email Helper — Full Report Email ────────────────────
@@ -606,6 +657,10 @@ async function sendConfirmation(b) {
     `
   });
   console.log('✓ Full report email sent to', email);
+  try {
+    const sub = db.prepare('SELECT id FROM submissions WHERE email = ?').get(email);
+    db.prepare('INSERT INTO email_log (submission_id, email_to, email_type, status) VALUES (?,?,?,?)').run(sub ? sub.id : null, email, 'report', 'sent');
+  } catch(e){}
 }
 
 // ─── 7-Day Follow-Up Email ────────────────────────────────

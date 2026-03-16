@@ -406,12 +406,47 @@
 
         var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem;"><h2 style="margin:0;">Admin Dashboard</h2><div style="display:flex;gap:0.5rem;"><button class="btn btn-sm btn-gold" onclick="exportCSV()">📊 Export CSV</button><button class="btn btn-sm btn-danger" onclick="sessionStorage.removeItem(\'admin_token\');location.hash=\'admin\';">Logout</button></div></div>';
 
+        // System health banner
+        fetch(API + '/api/health').then(function(r){return r.json();}).then(function(h) {
+          var banner = document.getElementById('healthBanner');
+          if (!banner) return;
+          var color = h.totalSubmissions > 0 ? '#27ae60' : '#f59e0b';
+          var volStatus = h.volumeMounted ? '✅ Persistent volume mounted' : (h.isRailway ? '🚨 NO PERSISTENT VOLUME — data will be lost on redeploy!' : '📂 Local storage (dev mode)');
+          var emailStatus = h.emailTransporterActive ? '✅ Email active (' + h.emailUser + ')' : '🚨 Email NOT configured — no emails being sent!';
+          banner.innerHTML = '<div style="padding:0.75rem 1rem;border-radius:8px;background:' + (h.volumeMounted || !h.isRailway ? '#f0fdf4' : '#fef2f2') + ';border:1px solid ' + (h.volumeMounted || !h.isRailway ? '#bbf7d0' : '#fca5a5') + ';margin-bottom:1rem;font-size:0.82rem;">' +
+            '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">' +
+            '<div><strong>System Health</strong> · ' + volStatus + ' · ' + emailStatus + '</div>' +
+            '<div style="color:#888;">DB created: ' + new Date(h.dbCreatedThisDeploy).toLocaleString() + ' · Emails: ' + h.emails.sent + ' sent, ' + h.emails.failed + ' failed, ' + h.emails.skipped + ' skipped</div>' +
+            '</div></div>';
+        });
+
+        // Email log loader
+        window.showEmailLog = function() {
+          fetch(API + '/api/admin/email-log', { headers: {'Authorization': 'Bearer ' + token} })
+          .then(function(r){return r.json();}).then(function(d) {
+            var el = document.getElementById('emailLogContent');
+            if (!el) return;
+            if (!d.emails || d.emails.length === 0) { el.innerHTML = '<p style="color:#999;text-align:center;padding:1rem;">No email log entries yet.</p>'; return; }
+            var h2 = '<table><thead><tr><th>To</th><th>Type</th><th>Status</th><th>Error</th><th>Sent At</th></tr></thead><tbody>';
+            d.emails.forEach(function(e) {
+              var stColor = e.status === 'sent' ? '#27ae60' : e.status === 'failed' ? '#e74c3c' : '#888';
+              h2 += '<tr><td style="font-size:0.8rem;">' + esc(e.email_to) + '</td><td style="font-size:0.8rem;">' + esc(e.email_type) + '</td><td style="font-weight:600;color:' + stColor + ';">' + esc(e.status) + '</td><td style="font-size:0.75rem;color:#999;">' + esc(e.error_message || '—') + '</td><td style="font-size:0.75rem;">' + (e.sent_at ? new Date(e.sent_at).toLocaleString() : '') + '</td></tr>';
+            });
+            h2 += '</tbody></table>';
+            el.innerHTML = h2;
+          });
+        };
+
         // Stats
+        html += '<div id="healthBanner"></div>';
         html += '<div class="grid-3" style="margin-bottom:1.5rem;">';
         html += '<div class="admin-card admin-stat"><div class="admin-stat-value">' + a.total + '</div><div class="admin-stat-label">Total Submissions</div></div>';
         html += '<div class="admin-card admin-stat"><div class="admin-stat-value">$' + (a.avgRevenue > 0 ? (a.avgRevenue/1000).toFixed(0) + 'K' : '—') + '</div><div class="admin-stat-label">Avg Revenue</div></div>';
         html += '<div class="admin-card admin-stat"><div class="admin-stat-value">' + (a.avgGap > 0 ? a.avgGap.toFixed(1) : '—') + '</div><div class="admin-stat-label">Avg CEO Gap Score</div></div>';
         html += '</div>';
+
+        // Email log section
+        html += '<div class="admin-card" style="margin-bottom:1.5rem;"><div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="margin-top:0;">📧 Email Delivery Log</h3><button class="btn btn-sm btn-primary" onclick="showEmailLog()">Load Email Log</button></div><div id="emailLogContent"><p style="color:#999;font-size:0.85rem;">Click "Load Email Log" to see all email delivery attempts (sent, failed, skipped).</p></div></div>';
 
         // Charts
         if (a.byInterest.length > 0 || a.byProblem.length > 0) {
